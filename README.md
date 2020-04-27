@@ -12,12 +12,13 @@ A Vim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/manua
 
 | Command                 | Description                                                                                                                                                                             |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CMakeConfigure          | Configure project. It uses `../<current directory name>-<build type>-build` as build folder. It will also generate `compile_commands.json` and add it symlink to the project directory. |
+| CMakeConfigure          | Configure project. It uses `../<current directory name>-<build type>-build` as a build folder. It will also generate `compile_commands.json` and add it symlink to the project directory. |
 | CMakeSelectBuildType    | Select build type (Release, Debug, etc.).                                                                                                                                               |
 | CMakeBuild              | Run compilation. It will compile the whole project if `g:cmake_build_all` is set to `v:true`, otherwise will build only selected target.                                                |
 | CMakeSelectTarget       | Select target for running / debugging.                                                                                                                                                  |
 | CMakeSetTargetArguments | Set arguments for running / debugging target.                                                                                                                                           |
 | CMakeRun                | Run selected target.                                                                                                                                                                    |
+| CMakeDebug                | Run `:Termdebug` on selected target.                                                                                                                                                                    |
 | CMakeToggleBuildAll     | Convenient toggling of `g:cmake_build_all` variable.                                                                                                                                    |
 
 ## Parameters
