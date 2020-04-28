@@ -5,8 +5,8 @@ let g:cmake_loaded = v:true
 let g:cmake_build_all = v:true
 let g:parameters_file = 'vim.json'
 
-command! CMakeConfigure call cmake#configure()
-command! CMakeBuild call cmake#build()
+command! -nargs=* -complete=shellcmd CMakeConfigure call cmake#configure(<q-args>)
+command! -nargs=* -complete=shellcmd CMakeBuild call cmake#build(<q-args>)
 command! CMakeRun call cmake#run()
 command! CMakeDebug call cmake#debug()
 command! CMakeClean call cmake#clean()

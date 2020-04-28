@@ -79,7 +79,7 @@ function! s:set_build_type(build_type) abort
 endfunction
 
 " Public interface
-function! cmake#configure() abort
+function! cmake#configure(additional_arguments) abort
   if !filereadable('CMakeLists.txt')
     echo 'Unable to find CMakeLists.txt'
     return
@@ -88,14 +88,14 @@ function! cmake#configure() abort
   let build_dir = s:get_build_dir(parameters)
   call mkdir(build_dir, 'p')
   call s:make_query_files(build_dir)
-  call asyncrun#run('', {}, 'cmake -D CMAKE_BUILD_TYPE=' . parameters['buildType'] . ' -D CMAKE_EXPORT_COMPILE_COMMANDS=1 -B ' . build_dir
+  call asyncrun#run('', {}, 'cmake ' . a:additional_arguments . ' -D CMAKE_BUILD_TYPE=' . parameters['buildType'] . ' -D CMAKE_EXPORT_COMPILE_COMMANDS=1 -B ' . build_dir
         \ . ' && ln -sf ' . fnamemodify(build_dir, ':.') . 'compile_commands.json')
 endfunction
 
-function! cmake#build() abort
+function! cmake#build(additional_arguments) abort
   let parameters = s:get_parameters()
   let target = parameters['buildAll'] ? 'all' : parameters['currentTarget']
-  call asyncrun#run('', {}, 'cmake --build ' . s:get_build_dir(parameters) . ' --target ' . target)
+  call asyncrun#run('', {}, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters) . ' --target ' . target)
 endfunction
 
 function! cmake#run() abort
