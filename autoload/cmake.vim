@@ -93,6 +93,10 @@ function! cmake#configure(additional_arguments) abort
 endfunction
 
 function! cmake#build(additional_arguments) abort
+  if g:cmake_save_before_build
+    wall
+  endif
+
   let parameters = s:get_parameters()
   let target = parameters['buildAll'] ? 'all' : parameters['currentTarget']
   call asyncrun#run('', {}, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters) . ' --target ' . target)

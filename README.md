@@ -16,7 +16,7 @@ A Vim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/manua
 | CMakeBuild              | Run compilation. It will compile the whole project if `g:cmake_build_all` is set to `v:true`, otherwise will build only selected target. Can accept additional arguments as in `CMakeConfigure`.                                                                                                                        |
 | CMakeRun                | Run selected target.                                                                                                                                                                                                                                                                                                    |
 | CMakeDebug              | Run `:Termdebug` on selected target.                                                                                                                                                                                                                                                                                    |
-| CMakeClear              | Execute `clear` target.                                                                                                                                                                                                                                                                                    |
+| CMakeClear              | Execute `clear` target.                                                                                                                                                                                                                                                                                                 |
 | CMakeSelectBuildType    | Select build type (Release, Debug, etc.).                                                                                                                                                                                                                                                                               |
 | CMakeSelectTarget       | Select target for running / debugging.                                                                                                                                                                                                                                                                                  |
 | CMakeSetTargetArguments | Set arguments for running / debugging target.                                                                                                                                                                                                                                                                           |
@@ -24,8 +24,9 @@ A Vim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/manua
 
 ## Parameters
 
-| Variable            | Description                                                                                                                       |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `g:cmake_loaded`    | Enable plugin loading. `v:true` by default.                                                                                       |
-| `g:cmake_build_all` | Build all project if enabled. Otherwise build only selected target. `v:true` by default.                                          |
-| `g:parameters_file` | JSON file to store information about selected target, run arguments and build type. `vim.json` (in project directory) by default. |
+| Variable                           | Description                                                                                                                       |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `g:cmake_loaded=v:true`            | Enable plugin loading.                                                                                                            |
+| `g:cmake_build_all=v:true`         | Build all project if enabled. Otherwise build only selected target.                                                               |
+| `g:cmake_save_before_build=v:true` | Save all files automatically before build.                                                                                        |
+| `g:parameters_file='vim.json'`     | JSON file to store information about selected target, run arguments and build type. `vim.json` (in project directory) by default. |
