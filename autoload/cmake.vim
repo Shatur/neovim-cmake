@@ -23,6 +23,10 @@ function! s:get_codemodel_targets(reply_dir) abort
   return codemodel_json['configurations'][0]['targets']
 endfunction
 
+function! s:get_target_info(codemodel_target, reply_dir) abort
+    return json_decode(readfile(a:reply_dir . a:codemodel_target['jsonFile']))
+endfunction
+
 " Tell CMake to generate codemodel
 function! s:make_query_files(build_dir) abort
   let query_dir = a:build_dir . '.cmake/api/v1/query/'
@@ -50,13 +54,13 @@ function! s:get_current_target_with_args() abort
 
   let reply_dir = s:get_reply_dir(build_dir)
   let codemodel_targets = s:get_codemodel_targets(reply_dir)
-  let target = json_decode(readfile(reply_dir . codemodel_targets[target_name]['jsonFile']))
-  if target['type'] !=? 'EXECUTABLE'
+  let target_info = s:get_target_info(reply_dir, codemodel_targets[target_name])
+  if target_info['type'] !=? 'EXECUTABLE'
     echo 'Specified target is not executable: ' . target_name
     return ''
   endif
 
-  let target_path = build_dir . target['artifacts'][0]['path']
+  let target_path = build_dir . target_info['artifacts'][0]['path']
   if !filereadable(target_path)
     echo 'Selected target is not built: ' . target_path
     return ''
@@ -151,9 +155,9 @@ function! cmake#select_target() abort
 
   let reply_dir = s:get_reply_dir(build_dir)
   for target in s:get_codemodel_targets(reply_dir)
-    let target_json = json_decode(readfile(reply_dir . target['jsonFile']))
-    let target_name = target_json['name']
-    let target_type = target_json['type']
+    let target_info = s:get_target_info(target, reply_dir)
+    let target_name = target_info['name']
+    let target_type = target_info['type']
     if target_type !=? 'UTILITY' && target_name !=? current_target
       call add(fzf_spec['source'], target_name . ' (' . tolower(target_type) . ')')
     endif
