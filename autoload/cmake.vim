@@ -23,7 +23,7 @@ function! s:get_codemodel_targets(reply_dir) abort
   return codemodel_json['configurations'][0]['targets']
 endfunction
 
-function! s:get_target_info(codemodel_target, reply_dir) abort
+function! s:get_target_info(reply_dir, codemodel_target) abort
     return json_decode(readfile(a:reply_dir . a:codemodel_target['jsonFile']))
 endfunction
 
@@ -107,7 +107,10 @@ function! cmake#build(additional_arguments) abort
 endfunction
 
 function! cmake#run() abort
-  call asyncrun#run('', {}, s:get_current_target_with_args())
+  let command = s:get_current_target_with_args()
+  if !empty(command)
+    call asyncrun#run('', {}, command)
+  endif
 endfunction
 
 function! cmake#debug() abort
@@ -155,7 +158,7 @@ function! cmake#select_target() abort
 
   let reply_dir = s:get_reply_dir(build_dir)
   for target in s:get_codemodel_targets(reply_dir)
-    let target_info = s:get_target_info(target, reply_dir)
+    let target_info = s:get_target_info(reply_dir, target)
     let target_name = target_info['name']
     let target_type = target_info['type']
     if target_type !=? 'UTILITY' && target_name !=? current_target
