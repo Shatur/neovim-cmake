@@ -1,7 +1,7 @@
-if exists('g:cmake_loaded') || !exists(':AsyncRun') || !exists(':FZF')
+if exists('g:loaded_cmake_projects') || !exists(':AsyncRun') || !exists(':FZF')
   finish
 endif
-let g:cmake_loaded = v:true
+let g:loaded_cmake_projects = v:true
 let g:cmake_build_all = v:true
 let g:cmake_save_before_build = v:true
 let g:parameters_file = 'vim.json'
