@@ -188,5 +188,10 @@ function! cmake#toogle_build_all() abort
 endfunction
 
 function! cmake#open_build_dir() abort
-  call asyncrun#run('', {'silent': 1}, 'xdg-open ' . s:get_build_dir(s:get_parameters()))
+  if has('win32')
+    let program = 'start '
+  else
+    let program = 'xdg-open '
+  endif
+  call asyncrun#run('', {'silent': 1}, program . s:get_build_dir(s:get_parameters()))
 endfunction
