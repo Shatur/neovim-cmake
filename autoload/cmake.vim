@@ -11,7 +11,7 @@ function! s:set_parameters(parameters) abort
 endfunction
 
 function! s:get_build_dir(parameters) abort
-  return getcwd() . '-' . a:parameters['buildType'] . '/'
+  return getcwd() . '-' . a:parameters['buildType'] . '-build/'
 endfunction
 
 function! s:get_reply_dir(build_dir) abort
