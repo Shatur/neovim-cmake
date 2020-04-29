@@ -130,6 +130,16 @@ function! cmake#clean() abort
   call asyncrun#run('', {}, 'cmake --build ' . s:get_build_dir(s:get_parameters()) . ' --target clean')
 endfunction
 
+function! cmake#build_and_run(additional_arguments) abort
+  autocmd User AsyncRunStop ++once if g:asyncrun_status ==? 'success' | call cmake#run() | endif
+  call cmake#build(a:additional_arguments)
+endfunction
+
+function! cmake#build_and_debug(additional_arguments) abort
+  autocmd User AsyncRunStop ++once if g:asyncrun_status ==? 'success' | call cmake#debug() | endif
+  call cmake#build(a:additional_arguments)
+endfunction
+
 function! cmake#select_build_type() abort
   let parameters = s:get_parameters()
   let current_build_type = parameters['buildType']
@@ -193,5 +203,5 @@ function! cmake#open_build_dir() abort
   else
     let program = 'xdg-open '
   endif
-  call asyncrun#run('', {'silent': 1}, program . s:get_build_dir(s:get_parameters()))
+  call asyncrun#run('', {'silent': v:true}, program . s:get_build_dir(s:get_parameters()))
 endfunction

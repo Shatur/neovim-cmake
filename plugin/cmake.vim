@@ -8,9 +8,13 @@ let g:parameters_file = 'vim.json'
 
 command! -nargs=* -complete=shellcmd CMakeConfigure call cmake#configure(<q-args>)
 command! -nargs=* -complete=shellcmd CMakeBuild call cmake#build(<q-args>)
+
 command! CMakeRun call cmake#run()
 command! CMakeDebug call cmake#debug()
 command! CMakeClean call cmake#clean()
+
+command! -nargs=* -complete=shellcmd CMakeBuildAndRun call cmake#build_and_run(<q-args>)
+command! -nargs=* -complete=shellcmd CMakeBuildAndDebug call cmake#build_and_debug(<q-args>)
 
 command! CMakeSelectBuildType call cmake#select_build_type()
 command! CMakeSelectTarget call cmake#select_target()
