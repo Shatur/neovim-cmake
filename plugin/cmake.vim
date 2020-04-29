@@ -17,3 +17,4 @@ command! CMakeSelectTarget call cmake#select_target()
 
 command! CMakeSetTargetArguments call cmake#set_target_arguments()
 command! CMakeToggleBuildAll call cmake#toogle_build_all()
+command! CMakeOpenBuildDir call cmake#open_build_dir()

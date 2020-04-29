@@ -186,3 +186,7 @@ function! cmake#toogle_build_all() abort
   call s:set_parameters(parameters)
   echo 'Build all targets' parameters['buildAll'] ? 'enabled' : 'disabled'
 endfunction
+
+function! cmake#open_build_dir() abort
+  call asyncrun#run('', {'silent': 1}, 'xdg-open ' . s:get_build_dir(s:get_parameters()))
+endfunction
