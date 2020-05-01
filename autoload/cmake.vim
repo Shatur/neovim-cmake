@@ -84,7 +84,16 @@ endfunction
 
 function! s:create_project(project_type) abort
   let project_name = input('Project name: ')
-  let project_path = input('Create in: ', g:default_projects_path) . '/' . project_name
+  if empty(project_name)
+    return
+  endif
+
+  let project_path = input('Create in: ', g:default_projects_path)
+  if empty(project_path)
+    return
+  endif
+
+  let project_name .= project_name
   call mkdir(project_path, 'p')
 
   let cmakelists_path = project_path . '/CMakeLists.txt'
@@ -92,6 +101,7 @@ function! s:create_project(project_type) abort
         \ '{',
         \ '}'
         \ ]
+
   if a:project_type ==? 'C++ project'
     let cmakelists = ['cmake_minimum_required(VERSION 3.5)',
           \ '',
@@ -113,6 +123,7 @@ function! s:create_project(project_type) abort
     call writefile(main, project_path . '/main.c')
   endif
   call writefile(cmakelists, cmakelists_path)
+
   execute 'edit ' . cmakelists_path
   cd %:h
 endfunction
