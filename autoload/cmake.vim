@@ -82,6 +82,41 @@ function! s:set_build_type(build_type) abort
   call s:set_parameters(parameters)
 endfunction
 
+function! s:create_project(project_type) abort
+  let project_name = input('Project name: ')
+  let project_path = input('Create in: ', g:default_projects_path) . '/' . project_name
+  call mkdir(project_path, 'p')
+
+  let cmakelists_path = project_path . '/CMakeLists.txt'
+  let main = ['int main(int argc, char *argv[])',
+        \ '{',
+        \ '}'
+        \ ]
+  if a:project_type ==? 'C++ project'
+    let cmakelists = ['cmake_minimum_required(VERSION 3.5)',
+          \ '',
+          \ 'project(' . project_name . ' LANGUAGES CXX)',
+          \ '',
+          \ 'set(CMAKE_CXX_STANDARD 17)',
+          \ 'set(CMAKE_CXX_STANDARD_REQUIRED ON)',
+          \ '',
+          \ 'add_executable(${CMAKE_PROJECT_NAME} main.cpp)'
+          \ ]
+    call writefile(main, project_path . '/main.cpp')
+  elseif a:project_type ==? 'C project'
+    let cmakelists = ['cmake_minimum_required(VERSION 3.5)',
+          \ '',
+          \ 'project(' . project_name . ' LANGUAGES C)',
+          \ '',
+          \ 'add_executable(${CMAKE_PROJECT_NAME} main.cpp)'
+          \ ]
+    call writefile(main, project_path . '/main.c')
+  endif
+  call writefile(cmakelists, cmakelists_path)
+  execute 'edit ' . cmakelists_path
+  cd %:h
+endfunction
+
 " Public interface
 function! cmake#configure(additional_arguments) abort
   if !filereadable('CMakeLists.txt')
@@ -205,3 +240,7 @@ function! cmake#open_build_dir() abort
   endif
   call asyncrun#run('', {'silent': v:true}, program . s:get_build_dir(s:get_parameters()))
 endfunction
+
+function! cmake#create_project() abort
+  call fzf#run(fzf#wrap({'source': ['C++ project', 'C project'], 'sink': function('s:create_project'), 'options': []}))
+endfunction`
