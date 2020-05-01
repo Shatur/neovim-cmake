@@ -34,3 +34,12 @@ A Vim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/manua
 | `g:cmake_build_all=v:true`         | Build all project if enabled. Otherwise build only selected target.                                                               |
 | `g:cmake_save_before_build=v:true` | Save all files automatically before build.                                                                                        |
 | `g:parameters_file='vim.json'`     | JSON file to store information about selected target, run arguments and build type. `vim.json` (in project directory) by default. |
+
+## Simple usage example
+
+1. Create a new project (`:CMakeCreateProject`) or open an existing.
+2. Configure project (`:CMakeConfigure`) to create build folder and get targets information
+3. Select target to execute (`:CMakeSelectTarget`).
+4. Build and run (`:CMakeBuildAndRun`)
+
+[Here](https://github.com/Shatur95/neovim-config/blob/master/plugin/vim-cmake-projects.vim) is my configuration.
