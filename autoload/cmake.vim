@@ -225,15 +225,27 @@ function! cmake#create_project() abort
     return
   endif
 
-  let project_location = input('Create in: ', g:default_projects_path)
+  let project_location = input('Create in: ', g:default_projects_path, 'file')
   if empty(project_location)
     redraw
     echo 'Project path cannot be empty'
     return
   endif
-
   call mkdir(project_location, 'p')
 
+  " Concatenate received data
+  if strcharpart(project_location, strlen(project_location) - 1) ==? '/'
+    let project_path = expand(project_location) . project_name
+  else
+    let project_path = expand(project_location) . '/' . project_name
+  endif
+
+  if !empty(glob(project_path))
+    redraw
+    echo 'Path ' . project_path . ' is already exists'
+    return
+  endif
+
   let samples = map(glob(g:samples_path . '*', v:true, v:true), 'fnamemodify(v:val, ":t")')
-  call fzf#run(fzf#wrap({'source': samples, 'sink': function('s:create_project', [project_location . '/' . project_name]), 'options': []}))
+  call fzf#run(fzf#wrap({'source': samples, 'sink': function('s:create_project', [project_path]), 'options': []}))
 endfunction`
