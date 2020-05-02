@@ -197,7 +197,7 @@ function! cmake#set_target_arguments() abort
     echo 'You need to select target first'
     return
   endif
-  let parametets['arguments'][current_target] = input(current_target . ' arguments: ', get(parametets['arguments'], current_target , ''))
+  let parametets['arguments'][current_target] = input(current_target . ' arguments: ', get(parametets['arguments'], current_target))
   call s:set_parameters(parametets)
 endfunction
 
