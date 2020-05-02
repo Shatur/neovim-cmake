@@ -5,6 +5,7 @@ let g:loaded_cmake_projects = v:true
 let g:cmake_build_all = v:true
 let g:cmake_save_before_build = v:true
 let g:parameters_file = 'vim.json'
+let g:samples_path = expand('<sfile>:p:h:h') . '/samples/'
 let g:default_projects_path = expand('~/Projects')
 
 command! -nargs=* -complete=shellcmd CMakeConfigure call cmake#configure(<q-args>)

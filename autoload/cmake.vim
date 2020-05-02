@@ -82,49 +82,14 @@ function! s:set_build_type(build_type) abort
   call s:set_parameters(parameters)
 endfunction
 
-function! s:create_project(project_type) abort
-  let project_name = input('Project name: ')
-  if empty(project_name)
+function! s:create_project(project_path, project_type) abort
+  let output = system('cp -r "' . g:samples_path . a:project_type . '" "' . a:project_path . '"')
+  if !empty(output)
+    echo output
     return
   endif
 
-  let project_path = input('Create in: ', g:default_projects_path)
-  if empty(project_path)
-    return
-  endif
-
-  let project_name .= project_name
-  call mkdir(project_path, 'p')
-
-  let cmakelists_path = project_path . '/CMakeLists.txt'
-  let main = ['int main(int argc, char *argv[])',
-        \ '{',
-        \ '}'
-        \ ]
-
-  if a:project_type ==? 'C++ project'
-    let cmakelists = ['cmake_minimum_required(VERSION 3.5)',
-          \ '',
-          \ 'project(' . project_name . ' LANGUAGES CXX)',
-          \ '',
-          \ 'set(CMAKE_CXX_STANDARD 17)',
-          \ 'set(CMAKE_CXX_STANDARD_REQUIRED ON)',
-          \ '',
-          \ 'add_executable(${CMAKE_PROJECT_NAME} main.cpp)'
-          \ ]
-    call writefile(main, project_path . '/main.cpp')
-  elseif a:project_type ==? 'C project'
-    let cmakelists = ['cmake_minimum_required(VERSION 3.5)',
-          \ '',
-          \ 'project(' . project_name . ' LANGUAGES C)',
-          \ '',
-          \ 'add_executable(${CMAKE_PROJECT_NAME} main.cpp)'
-          \ ]
-    call writefile(main, project_path . '/main.c')
-  endif
-  call writefile(cmakelists, cmakelists_path)
-
-  execute 'edit ' . cmakelists_path
+  execute 'edit ' . a:project_path . '/CMakeLists.txt'
   cd %:h
 endfunction
 
@@ -253,5 +218,22 @@ function! cmake#open_build_dir() abort
 endfunction
 
 function! cmake#create_project() abort
-  call fzf#run(fzf#wrap({'source': ['C++ project', 'C project'], 'sink': function('s:create_project'), 'options': []}))
+  let project_name = input('Project name: ')
+  if empty(project_name)
+    redraw
+    echo 'Project name cannot be empty'
+    return
+  endif
+
+  let project_location = input('Create in: ', g:default_projects_path)
+  if empty(project_location)
+    redraw
+    echo 'Project path cannot be empty'
+    return
+  endif
+
+  call mkdir(project_location, 'p')
+
+  let samples = map(glob(g:samples_path . '*', v:true, v:true), 'fnamemodify(v:val, ":t")')
+  call fzf#run(fzf#wrap({'source': samples, 'sink': function('s:create_project', [project_location . '/' . project_name]), 'options': []}))
 endfunction`
