@@ -70,16 +70,14 @@ function! s:get_current_target_with_args() abort
 endfunction
 
 " FZF callbacks
-function! s:set_current_target(fzf_string) abort
-  let parameters = s:get_parameters()
-  let parameters['currentTarget'] = strpart(a:fzf_string, 0, stridx(a:fzf_string, ' '))
-  call s:set_parameters(parameters)
+function! s:set_current_target(parameters, fzf_string) abort
+  let a:parameters['currentTarget'] = strpart(a:fzf_string, 0, stridx(a:fzf_string, ' '))
+  call s:set_parameters(a:parameters)
 endfunction
 
-function! s:set_build_type(build_type) abort
-  let parameters = s:get_parameters()
-  let parameters['buildType'] = a:build_type
-  call s:set_parameters(parameters)
+function! s:set_build_type(parameters, build_type) abort
+  let a:parameters['buildType'] = a:build_type
+  call s:set_parameters(a:parameters)
 endfunction
 
 function! s:create_project(project_path, project_type) abort
@@ -154,7 +152,7 @@ endfunction
 function! cmake#select_build_type() abort
   let parameters = s:get_parameters()
   let current_build_type = parameters['buildType']
-  let fzf_spec = {'source': [], 'sink': function('s:set_build_type'), 'options': ['--header', parameters['buildType']]}
+  let fzf_spec = {'source': [], 'sink': function('s:set_build_type', [parameters]), 'options': ['--header', parameters['buildType']]}
   for build_type in ['Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel']
     if build_type !=? current_build_type
       call add(fzf_spec['source'], build_type)
@@ -171,7 +169,7 @@ function! cmake#select_target() abort
     return
   endif
 
-  let fzf_spec = {'source': [], 'sink': function('s:set_current_target'), 'options': []}
+  let fzf_spec = {'source': [], 'sink': function('s:set_current_target', [parameters]), 'options': []}
   let current_target = parameters['currentTarget']
   if !empty(current_target)
     let fzf_spec['options'] += ['--header', current_target]
