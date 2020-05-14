@@ -92,6 +92,10 @@ function! s:create_project(project_path, project_type) abort
 endfunction
 
 " Public interface
+function! cmake#get_build_dir()
+  return s:get_build_dir(s:get_parameters())
+endfunction
+
 function! cmake#configure(additional_arguments) abort
   if !filereadable('CMakeLists.txt')
     echo 'Unable to find CMakeLists.txt'
@@ -136,7 +140,7 @@ function! cmake#debug() abort
 endfunction
 
 function! cmake#clean() abort
-  call asyncrun#run('', {}, 'cmake --build ' . s:get_build_dir(s:get_parameters()) . ' --target clean')
+  call asyncrun#run('', {}, 'cmake --build ' . cmake#get_build_dir() . ' --target clean')
 endfunction
 
 function! cmake#build_and_run(additional_arguments) abort
@@ -188,33 +192,6 @@ function! cmake#select_target() abort
   call fzf#run(fzf#wrap(fzf_spec))
 endfunction
 
-function! cmake#set_target_arguments() abort
-  let parametets = s:get_parameters()
-  let current_target = parametets['currentTarget']
-  if empty(current_target)
-    echo 'You need to select target first'
-    return
-  endif
-  let parametets['arguments'][current_target] = input(current_target . ' arguments: ', get(parametets['arguments'], current_target))
-  call s:set_parameters(parametets)
-endfunction
-
-function! cmake#toogle_build_all() abort
-  let parameters = s:get_parameters()
-  let parameters['buildAll'] = !parameters['buildAll']
-  call s:set_parameters(parameters)
-  echo 'Build all targets' parameters['buildAll'] ? 'enabled' : 'disabled'
-endfunction
-
-function! cmake#open_build_dir() abort
-  if has('win32')
-    let program = 'start '
-  else
-    let program = 'xdg-open '
-  endif
-  call asyncrun#run('', {'silent': v:true}, program . s:get_build_dir(s:get_parameters()))
-endfunction
-
 function! cmake#create_project() abort
   let project_name = input('Project name: ')
   if empty(project_name)
@@ -247,3 +224,30 @@ function! cmake#create_project() abort
   let samples = map(glob(g:samples_path . '*', v:true, v:true), 'fnamemodify(v:val, ":t")')
   call fzf#run(fzf#wrap({'source': samples, 'sink': function('s:create_project', [project_path]), 'options': []}))
 endfunction`
+
+function! cmake#set_target_arguments() abort
+  let parametets = s:get_parameters()
+  let current_target = parametets['currentTarget']
+  if empty(current_target)
+    echo 'You need to select target first'
+    return
+  endif
+  let parametets['arguments'][current_target] = input(current_target . ' arguments: ', get(parametets['arguments'], current_target))
+  call s:set_parameters(parametets)
+endfunction
+
+function! cmake#toogle_build_all() abort
+  let parameters = s:get_parameters()
+  let parameters['buildAll'] = !parameters['buildAll']
+  call s:set_parameters(parameters)
+  echo 'Build all targets' parameters['buildAll'] ? 'enabled' : 'disabled'
+endfunction
+
+function! cmake#open_build_dir() abort
+  if has('win32')
+    let program = 'start '
+  else
+    let program = 'xdg-open '
+  endif
+  call asyncrun#run('', {'silent': v:true}, program . cmake#get_build_dir())
+endfunction
