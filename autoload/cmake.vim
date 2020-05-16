@@ -1,13 +1,13 @@
 " Helpers
 function! s:get_parameters() abort
-  if !filereadable(g:parameters_file)
+  if !filereadable(g:cmake_parameters_file)
     return {'currentTarget': '', 'buildType': 'Debug', 'buildAll': v:true, 'arguments': {}}
   endif
-  return json_decode(readfile(g:parameters_file))
+  return json_decode(readfile(g:cmake_parameters_file))
 endfunction
 
 function! s:set_parameters(parameters) abort
-  call writefile([json_encode(a:parameters)], g:parameters_file)
+  call writefile([json_encode(a:parameters)], g:cmake_parameters_file)
 endfunction
 
 function! s:get_build_dir(parameters) abort
@@ -81,7 +81,7 @@ function! s:set_build_type(parameters, build_type) abort
 endfunction
 
 function! s:create_project(project_path, project_type) abort
-  let output = system('cp -r "' . g:samples_path . a:project_type . '" "' . a:project_path . '"')
+  let output = system('cp -r "' . g:cmake_samples_path . a:project_type . '" "' . a:project_path . '"')
   if !empty(output)
     echo output
     return
@@ -102,7 +102,7 @@ function! cmake#configure(additional_arguments) abort
     return
   endif
 
-  if g:cmake_save_before_build
+  if g:cmake_autosave
     wall
   endif
 
@@ -115,7 +115,7 @@ function! cmake#configure(additional_arguments) abort
 endfunction
 
 function! cmake#build(additional_arguments) abort
-  if g:cmake_save_before_build
+  if g:cmake_autosave
     wall
   endif
 
@@ -205,7 +205,7 @@ function! cmake#create_project() abort
     return
   endif
 
-  let project_location = input('Create in: ', g:default_projects_path, 'file')
+  let project_location = input('Create in: ', g:default_cmake_projects_path, 'file')
   if empty(project_location)
     redraw
     echo 'Project path cannot be empty'
@@ -226,7 +226,7 @@ function! cmake#create_project() abort
     return
   endif
 
-  let samples = map(glob(g:samples_path . '*', v:true, v:true), 'fnamemodify(v:val, ":t")')
+  let samples = map(glob(g:cmake_samples_path . '*', v:true, v:true), 'fnamemodify(v:val, ":t")')
   call fzf#run(fzf#wrap({'source': samples, 'sink': function('s:create_project', [project_path]), 'options': []}))
 endfunction`
 

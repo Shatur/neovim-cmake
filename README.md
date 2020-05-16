@@ -29,14 +29,14 @@ A Vim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/manua
 
 ## Parameters
 
-| Variable                    | Default value                           | Description                                                                                                                       |
-| --------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `g:loaded_cmake_projects`   | `v:true`                                | Set this value to `v:false` to disable plugin loading.                                                                            |
-| `g:cmake_build_all`         | `v:true`                                | Build all project if enabled. Otherwise build only selected target.                                                               |
-| `g:cmake_save_before_build` | `v:true`                                | Save all files automatically before build.                                                                                        |
-| `g:parameters_file`         | `'vim.json'`                            | JSON file to store information about selected target, run arguments and build type. `vim.json` (in project directory) by default. |
-| `g:samples_path`            | `expand('<sfile>:p:h:h') . '/samples/'` | Folder with samples. `samples` folder from the plugin directory is used by default.                                               |
-| `g:default_projects_path`   | `expand('~/Projects')`                  | Default folder for creating project.                                                                                              |
+| Variable                        | Default value                           | Description                                                                                                                       |
+| ------------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `g:loaded_cmake_projects`       | `v:true`                                | Set this value to `v:false` to disable plugin loading.                                                                            |
+| `g:cmake_build_all`             | `v:true`                                | Build all project if enabled. Otherwise build only selected target.                                                               |
+| `g:cmake_autosave`              | `v:true`                                | Save all files automatically before build.                                                                                        |
+| `g:cmake_parameters_file`       | `'vim.json'`                            | JSON file to store information about selected target, run arguments and build type. `vim.json` (in project directory) by default. |
+| `g:cmake_samples_path`          | `expand('<sfile>:p:h:h') . '/samples/'` | Folder with samples. `samples` folder from the plugin directory is used by default.                                               |
+| `g:default_cmake_projects_path` | `expand('~/Projects')`                  | Default folder for creating project.                                                                                              |
 
 ## Simple usage example
 
