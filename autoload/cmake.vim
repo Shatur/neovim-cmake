@@ -42,13 +42,13 @@ function! s:get_current_target_with_args() abort
   let parameters = s:get_parameters()
   let build_dir = s:get_build_dir(parameters)
   if !isdirectory(build_dir)
-    echo 'You need to configure first'
+    echom 'You need to configure first'
     return ''
   endif
 
   let target_name = parameters['currentTarget']
   if empty(target_name)
-    echo 'You need to select target first'
+    echom 'You need to select target first'
     return ''
   endif
 
@@ -56,13 +56,13 @@ function! s:get_current_target_with_args() abort
   let codemodel_targets = s:get_codemodel_targets(reply_dir)
   let target_info = s:get_target_info(reply_dir, codemodel_targets[target_name])
   if target_info['type'] !=? 'EXECUTABLE'
-    echo 'Specified target is not executable: ' . target_name
+    echom 'Specified target is not executable: ' . target_name
     return ''
   endif
 
   let target_path = build_dir . target_info['artifacts'][0]['path']
   if !filereadable(target_path)
-    echo 'Selected target is not built: ' . target_path
+    echom 'Selected target is not built: ' . target_path
     return ''
   endif
 
@@ -83,7 +83,7 @@ endfunction
 function! s:create_project(project_path, project_type) abort
   let output = system('cp -r "' . g:cmake_samples_path . a:project_type . '" "' . a:project_path . '"')
   if !empty(output)
-    echo output
+    echom output
     return
   endif
 
@@ -98,7 +98,7 @@ endfunction
 
 function! cmake#configure(additional_arguments) abort
   if !filereadable('CMakeLists.txt')
-    echo 'Unable to find CMakeLists.txt'
+    echom 'Unable to find CMakeLists.txt'
     return
   endif
 
@@ -174,7 +174,7 @@ function! cmake#select_target() abort
   let parameters = s:get_parameters()
   let build_dir = s:get_build_dir(parameters)
   if !isdirectory(build_dir)
-    echo 'You need to configure first'
+    echom 'You need to configure first'
     return
   endif
 
@@ -201,14 +201,14 @@ function! cmake#create_project() abort
   let project_name = input('Project name: ')
   if empty(project_name)
     redraw
-    echo 'Project name cannot be empty'
+    echom 'Project name cannot be empty'
     return
   endif
 
   let project_location = input('Create in: ', g:default_cmake_projects_path, 'file')
   if empty(project_location)
     redraw
-    echo 'Project path cannot be empty'
+    echom 'Project path cannot be empty'
     return
   endif
   call mkdir(project_location, 'p')
@@ -222,7 +222,7 @@ function! cmake#create_project() abort
 
   if !empty(glob(project_path))
     redraw
-    echo 'Path ' . project_path . ' is already exists'
+    echom 'Path ' . project_path . ' is already exists'
     return
   endif
 
@@ -234,7 +234,7 @@ function! cmake#set_target_arguments() abort
   let parametets = s:get_parameters()
   let current_target = parametets['currentTarget']
   if empty(current_target)
-    echo 'You need to select target first'
+    echom 'You need to select target first'
     return
   endif
   let parametets['arguments'][current_target] = input(current_target . ' arguments: ', get(parametets['arguments'], current_target))
@@ -245,7 +245,7 @@ function! cmake#toogle_build_all() abort
   let parameters = s:get_parameters()
   let parameters['buildAll'] = !parameters['buildAll']
   call s:set_parameters(parameters)
-  echo 'Build all targets' parameters['buildAll'] ? 'enabled' : 'disabled'
+  echom 'Build all targets' parameters['buildAll'] ? 'enabled' : 'disabled'
 endfunction
 
 function! cmake#open_build_dir() abort
