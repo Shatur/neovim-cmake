@@ -101,6 +101,11 @@ function! cmake#configure(additional_arguments) abort
     echo 'Unable to find CMakeLists.txt'
     return
   endif
+
+  if g:cmake_save_before_build
+    wall
+  endif
+
   let parameters = s:get_parameters()
   let build_dir = s:get_build_dir(parameters)
   call mkdir(build_dir, 'p')
