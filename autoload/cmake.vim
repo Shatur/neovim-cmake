@@ -84,6 +84,12 @@ function! s:get_current_command() abort
   return target_path . ' ' . get(parameters['arguments'], target_info['name'], '')
 endfunction
 
+function! s:autoclose_quickfix(options)
+  if (get(a:options, 'mode', 'async') !=? 'async')
+    cclose
+  endif
+endfunction
+
 " FZF callbacks
 function! s:set_current_target(parameters, fzf_string) abort
   let a:parameters['currentTarget'] = strpart(a:fzf_string, 0, stridx(a:fzf_string, ' '))
@@ -136,13 +142,15 @@ function! cmake#build(additional_arguments) abort
 
   let parameters = s:get_parameters()
   let target = parameters['buildAll'] ? 'all' : parameters['currentTarget']
-  call asyncrun#run('', {}, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters) . ' --target ' . target)
+  call s:autoclose_quickfix(g:cmake_build_options)
+  call asyncrun#run('', g:cmake_build_options, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters) . ' --target ' . target)
 endfunction
 
 function! cmake#run() abort
   let command = s:get_current_command()
   if !empty(command)
-    call asyncrun#run('', {}, command)
+    call s:autoclose_quickfix(g:cmake_run_options)
+    call asyncrun#run('', g:cmake_run_options, command)
   endif
 endfunction
 
@@ -160,7 +168,8 @@ function! cmake#debug() abort
 endfunction
 
 function! cmake#clean() abort
-  call asyncrun#run('', {}, 'cmake --build ' . cmake#get_build_dir() . ' --target clean')
+  call s:autoclose_quickfix(g:cmake_clean_options)
+  call asyncrun#run('', g:cmake_clean_options, 'cmake --build ' . cmake#get_build_dir() . ' --target clean')
 endfunction
 
 function! cmake#build_and_run(additional_arguments) abort

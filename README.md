@@ -37,6 +37,9 @@ A Vim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/manua
 | `g:cmake_parameters_file`       | `'vim.json'`                            | JSON file to store information about selected target, run arguments and build type. `vim.json` (in project directory) by default. |
 | `g:cmake_samples_path`          | `expand('<sfile>:p:h:h') . '/samples/'` | Folder with samples. `samples` folder from the plugin directory is used by default.                                               |
 | `g:default_cmake_projects_path` | `expand('~/Projects')`                  | Default folder for creating project.                                                                                              |
+| `g:cmake_build_options`         | `{}`                                    | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed to the command during build.           |
+| `g:cmake_run_options`           | `{}`                                    | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed to the command during build.           |
+| `g:cmake_clean_options`         | `{}`                                    | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed to the command during build.           |
 
 ## Simple usage example
 
