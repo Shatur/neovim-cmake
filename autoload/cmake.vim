@@ -123,23 +123,15 @@ function! cmake#configure(additional_arguments) abort
     return
   endif
 
-  if g:cmake_autosave
-    wall
-  endif
-
   let parameters = s:get_parameters()
   let build_dir = s:get_build_dir(parameters)
   call mkdir(build_dir, 'p')
   call s:make_query_files(build_dir)
-  call asyncrun#run('', {}, 'cmake ' . a:additional_arguments . ' -D CMAKE_BUILD_TYPE=' . parameters['buildType'] . ' -D CMAKE_EXPORT_COMPILE_COMMANDS=1 -B ' . build_dir
+  call asyncrun#run('', g:cmake_configure_options, 'cmake ' . a:additional_arguments . ' -D CMAKE_BUILD_TYPE=' . parameters['buildType'] . ' -D CMAKE_EXPORT_COMPILE_COMMANDS=1 -B ' . build_dir
         \ . ' && ln -sf ' . fnamemodify(build_dir, ':.') . 'compile_commands.json')
 endfunction
 
 function! cmake#build(additional_arguments) abort
-  if g:cmake_autosave
-    wall
-  endif
-
   let parameters = s:get_parameters()
   let target = parameters['buildAll'] ? 'all' : parameters['currentTarget']
   call s:autoclose_quickfix(g:cmake_build_options)
