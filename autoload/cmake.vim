@@ -51,14 +51,20 @@ function! s:get_current_executable_info(parameters, build_dir) abort
   endif
 
   let reply_dir = s:get_reply_dir(a:build_dir)
-  let codemodel_targets = s:get_codemodel_targets(reply_dir)
-  let target_info = s:get_target_info(reply_dir, codemodel_targets[target_name])
-  if target_info['type'] !=? 'EXECUTABLE'
-    echom 'Specified target is not executable: ' . target_name
-    return ''
-  endif
+  for target in s:get_codemodel_targets(reply_dir)
+    if target_name !=? target['name']
+      continue
+    endif
+    let target_info = s:get_target_info(reply_dir, target)
+    if target_info['type'] !=? 'EXECUTABLE'
+      echom 'Specified target is not executable: ' . target_name
+      return ''
+    endif
+    return target_info
+  endfor
 
-  return target_info
+  echom 'Unable to find the following target: ' . target_name
+  return ''
 endfunction
 
 function! s:get_current_command() abort
