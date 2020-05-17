@@ -40,13 +40,13 @@ endfunction
 
 function! s:get_current_executable_info(parameters, build_dir) abort
   if !isdirectory(a:build_dir)
-    echom 'You need to configure first'
+    echomsg 'You need to configure first'
     return ''
   endif
 
   let target_name = a:parameters['currentTarget']
   if empty(target_name)
-    echom 'You need to select target first'
+    echomsg 'You need to select target first'
     return ''
   endif
 
@@ -57,13 +57,13 @@ function! s:get_current_executable_info(parameters, build_dir) abort
     endif
     let target_info = s:get_target_info(reply_dir, target)
     if target_info['type'] !=? 'EXECUTABLE'
-      echom 'Specified target is not executable: ' . target_name
+      echomsg 'Specified target is not executable: ' . target_name
       return ''
     endif
     return target_info
   endfor
 
-  echom 'Unable to find the following target: ' . target_name
+  echomsg 'Unable to find the following target: ' . target_name
   return ''
 endfunction
 
@@ -77,7 +77,7 @@ function! s:get_current_command() abort
 
   let target_path = build_dir . target_info['artifacts'][0]['path']
   if !filereadable(target_path)
-    echom 'Selected target is not built: ' . target_path
+    echomsg 'Selected target is not built: ' . target_path
     return ''
   endif
 
@@ -104,7 +104,7 @@ endfunction
 function! s:create_project(project_path, project_type) abort
   let output = system('cp -r "' . g:cmake_samples_path . a:project_type . '" "' . a:project_path . '"')
   if !empty(output)
-    echom output
+    echomsg output
     return
   endif
 
@@ -119,7 +119,7 @@ endfunction
 
 function! cmake#configure(additional_arguments) abort
   if !filereadable('CMakeLists.txt')
-    echom 'Unable to find CMakeLists.txt'
+    echomsg 'Unable to find CMakeLists.txt'
     return
   endif
 
@@ -205,7 +205,7 @@ function! cmake#select_target() abort
   let parameters = s:get_parameters()
   let build_dir = s:get_build_dir(parameters)
   if !isdirectory(build_dir)
-    echom 'You need to configure first'
+    echomsg 'You need to configure first'
     return
   endif
 
@@ -232,14 +232,14 @@ function! cmake#create_project() abort
   let project_name = input('Project name: ')
   if empty(project_name)
     redraw
-    echom 'Project name cannot be empty'
+    echomsg 'Project name cannot be empty'
     return
   endif
 
   let project_location = input('Create in: ', g:default_cmake_projects_path, 'file')
   if empty(project_location)
     redraw
-    echom 'Project path cannot be empty'
+    echomsg 'Project path cannot be empty'
     return
   endif
   call mkdir(project_location, 'p')
@@ -253,7 +253,7 @@ function! cmake#create_project() abort
 
   if !empty(glob(project_path))
     redraw
-    echom 'Path ' . project_path . ' is already exists'
+    echomsg 'Path ' . project_path . ' is already exists'
     return
   endif
 
