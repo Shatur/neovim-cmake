@@ -5,7 +5,7 @@ A Vim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/manua
 ## Dependencies
 
 - [cmake](https://cmake.org) for building and reading project information.
-- [fzf](https://github.com/skywind3000/asyncrun.vim) to select targets and build types.
+- [fzf](https://github.com/junegunn/fzf) to select targets and build types.
 - [AsyncRun](https://github.com/skywind3000/asyncrun.vim) to run all tasks asynchronously.
 
 ## Commands
