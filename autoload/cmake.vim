@@ -81,7 +81,7 @@ function! s:get_current_command() abort
     return ''
   endif
 
-  return target_path . ' ' . get(parameters['arguments'], target_info['name'])
+  return target_path . ' ' . get(parameters['arguments'], target_info['name'], '')
 endfunction
 
 " FZF callbacks
@@ -263,7 +263,7 @@ function! cmake#set_target_arguments() abort
   endif
 
   let current_target_name = current_target['name']
-  let parameters['arguments'][current_target_name] = input(current_target_name . ' arguments: ', get(parameters['arguments'], current_target_name))
+  let parameters['arguments'][current_target_name] = input(current_target_name . ' arguments: ', get(parameters['arguments'], current_target_name, ''))
   call s:set_parameters(parameters)
 endfunction
 
