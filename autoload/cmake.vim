@@ -1,7 +1,7 @@
 " Helpers
 function! s:get_parameters() abort
   if !filereadable(g:cmake_parameters_file)
-    return {'currentTarget': '', 'buildType': 'Debug', 'buildAll': v:true, 'arguments': {}}
+    return {'currentTarget': '', 'buildType': 'Debug', 'arguments': {}}
   endif
   return json_decode(readfile(g:cmake_parameters_file))
 endfunction
@@ -133,9 +133,14 @@ endfunction
 
 function! cmake#build(additional_arguments) abort
   let parameters = s:get_parameters()
-  let target = parameters['buildAll'] ? 'all' : parameters['currentTarget']
   call s:autoclose_quickfix(g:cmake_build_options)
-  call asyncrun#run('', g:cmake_build_options, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters) . ' --target ' . target)
+  call asyncrun#run('', g:cmake_build_options, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters) . ' --target ' . parameters['currentTarget'])
+endfunction
+
+function! cmake#build_all(additional_arguments) abort
+  let parameters = s:get_parameters()
+  call s:autoclose_quickfix(g:cmake_build_options)
+  call asyncrun#run('', g:cmake_build_options, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters))
 endfunction
 
 function! cmake#run() abort
@@ -266,13 +271,6 @@ function! cmake#set_target_arguments() abort
   let current_target_name = current_target['name']
   let parameters['arguments'][current_target_name] = input(current_target_name . ' arguments: ', get(parameters['arguments'], current_target_name, ''))
   call s:set_parameters(parameters)
-endfunction
-
-function! cmake#toogle_build_all() abort
-  let parameters = s:get_parameters()
-  let parameters['buildAll'] = !parameters['buildAll']
-  call s:set_parameters(parameters)
-  echom 'Build all targets' parameters['buildAll'] ? 'enabled' : 'disabled'
 endfunction
 
 function! cmake#open_build_dir() abort
