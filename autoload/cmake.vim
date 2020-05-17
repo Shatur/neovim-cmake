@@ -279,5 +279,5 @@ function! cmake#open_build_dir() abort
   else
     let program = 'xdg-open '
   endif
-  call asyncrun#run('', {'silent': v:true}, program . cmake#get_build_dir())
+  call system(program . cmake#get_build_dir())
 endfunction
