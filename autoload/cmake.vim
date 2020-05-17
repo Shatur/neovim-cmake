@@ -38,25 +38,34 @@ function! s:make_query_files(build_dir) abort
   endif
 endfunction
 
-function! s:get_current_target_with_args() abort
-  let parameters = s:get_parameters()
-  let build_dir = s:get_build_dir(parameters)
-  if !isdirectory(build_dir)
+function! s:get_current_executable_info(parameters, build_dir) abort
+  if !isdirectory(a:build_dir)
     echom 'You need to configure first'
     return ''
   endif
 
-  let target_name = parameters['currentTarget']
+  let target_name = a:parameters['currentTarget']
   if empty(target_name)
     echom 'You need to select target first'
     return ''
   endif
 
-  let reply_dir = s:get_reply_dir(build_dir)
+  let reply_dir = s:get_reply_dir(a:build_dir)
   let codemodel_targets = s:get_codemodel_targets(reply_dir)
   let target_info = s:get_target_info(reply_dir, codemodel_targets[target_name])
   if target_info['type'] !=? 'EXECUTABLE'
     echom 'Specified target is not executable: ' . target_name
+    return ''
+  endif
+
+  return target_info
+endfunction
+
+function! s:get_current_command() abort
+  let parameters = s:get_parameters()
+  let build_dir = s:get_build_dir(parameters)
+  let target_info = s:get_current_executable_info(parameters, build_dir)
+  if empty(target_info)
     return ''
   endif
 
@@ -66,7 +75,7 @@ function! s:get_current_target_with_args() abort
     return ''
   endif
 
-  return target_path . ' ' . get(parameters['arguments'], target_name)
+  return target_path . ' ' . get(parameters['arguments'], target_info['name'])
 endfunction
 
 " FZF callbacks
@@ -125,14 +134,14 @@ function! cmake#build(additional_arguments) abort
 endfunction
 
 function! cmake#run() abort
-  let command = s:get_current_target_with_args()
+  let command = s:get_current_command()
   if !empty(command)
     call asyncrun#run('', {}, command)
   endif
 endfunction
 
 function! cmake#debug() abort
-  let command = s:get_current_target_with_args()
+  let command = s:get_current_command()
   if empty(command)
     return
   endif
@@ -149,11 +158,21 @@ function! cmake#clean() abort
 endfunction
 
 function! cmake#build_and_run(additional_arguments) abort
+  let parameters = s:get_parameters()
+  if empty(s:get_current_executable_info(parameters, s:get_build_dir(parameters)))
+    return
+  endif
+
   autocmd User AsyncRunStop ++once if g:asyncrun_status ==? 'success' | call cmake#run() | endif
   call cmake#build(a:additional_arguments)
 endfunction
 
 function! cmake#build_and_debug(additional_arguments) abort
+  let parameters = s:get_parameters()
+  if empty(s:get_current_executable_info(parameters, s:get_build_dir(parameters)))
+    return
+  endif
+
   autocmd User AsyncRunStop ++once if g:asyncrun_status ==? 'success' | call cmake#debug() | endif
   call cmake#build(a:additional_arguments)
 endfunction
@@ -231,14 +250,15 @@ function! cmake#create_project() abort
 endfunction`
 
 function! cmake#set_target_arguments() abort
-  let parametets = s:get_parameters()
-  let current_target = parametets['currentTarget']
+  let parameters = s:get_parameters()
+  let current_target = s:get_current_executable_info(parameters, s:get_build_dir(parameters))
   if empty(current_target)
-    echom 'You need to select target first'
     return
   endif
-  let parametets['arguments'][current_target] = input(current_target . ' arguments: ', get(parametets['arguments'], current_target))
-  call s:set_parameters(parametets)
+
+  let current_target_name = current_target['name']
+  let parameters['arguments'][current_target_name] = input(current_target_name . ' arguments: ', get(parameters['arguments'], current_target_name))
+  call s:set_parameters(parameters)
 endfunction
 
 function! cmake#toogle_build_all() abort
