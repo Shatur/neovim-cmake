@@ -81,7 +81,7 @@ function! s:get_current_command() abort
     return ''
   endif
 
-  return target_path . ' ' . get(parameters['arguments'], target_info['name'], '')
+  return [build_dir, target_path . ' ' . get(parameters['arguments'], target_info['name'], '')]
 endfunction
 
 function! s:autoclose_quickfix(options)
@@ -144,15 +144,15 @@ function! cmake#build_all(additional_arguments) abort
 endfunction
 
 function! cmake#run() abort
-  let command = s:get_current_command()
+  let [build_dir, command] = s:get_current_command()
   if !empty(command)
     call s:autoclose_quickfix(g:cmake_run_options)
-    call asyncrun#run('', g:cmake_run_options, command)
+    call asyncrun#run('', extend(g:cmake_run_options, {'cwd': build_dir}), command)
   endif
 endfunction
 
 function! cmake#debug() abort
-  let command = s:get_current_command()
+  let [build_dir, command] = s:get_current_command()
   if empty(command)
     return
   endif

@@ -1,6 +1,7 @@
 if exists('g:loaded_cmake_projects') || !exists(':AsyncRun') || !exists(':FZF')
   finish
 endif
+
 let g:loaded_cmake_projects = get(g:, 'loaded_cmake_projects', v:true)
 let g:cmake_parameters_file = get(g:, 'cmake_parameters_file', 'vim.json')
 let g:cmake_samples_path = get(g:, 'cmake_samples_path', expand('<sfile>:p:h:h') . '/samples/')
