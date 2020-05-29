@@ -133,8 +133,14 @@ endfunction
 
 function! cmake#build(additional_arguments) abort
   let parameters = s:get_parameters()
+  let target_name = parameters['currentTarget']
+  if empty(target_name)
+    echomsg 'You need to select target first'
+    return
+  endif
+
   call s:autoclose_quickfix(g:cmake_build_options)
-  call asyncrun#run('', g:cmake_build_options, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters) . ' --target ' . parameters['currentTarget'])
+  call asyncrun#run('', g:cmake_build_options, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters) . ' --target ' . target_name)
 endfunction
 
 function! cmake#build_all(additional_arguments) abort
