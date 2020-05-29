@@ -72,13 +72,13 @@ function! s:get_current_command() abort
   let build_dir = s:get_build_dir(parameters)
   let target_info = s:get_current_executable_info(parameters, build_dir)
   if empty(target_info)
-    return ''
+    return [build_dir, '']
   endif
 
   let target_path = build_dir . target_info['artifacts'][0]['path']
   if !filereadable(target_path)
     echomsg 'Selected target is not built: ' . target_path
-    return ''
+    return [build_dir, '']
   endif
 
   return [build_dir, target_path . ' ' . get(parameters['arguments'], target_info['name'], '')]
