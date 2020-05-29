@@ -72,16 +72,16 @@ function! s:get_current_command() abort
   let build_dir = s:get_build_dir(parameters)
   let target_info = s:get_current_executable_info(parameters, build_dir)
   if empty(target_info)
-    return [build_dir, '']
+    return ['', '']
   endif
 
   let target_path = build_dir . target_info['artifacts'][0]['path']
   if !filereadable(target_path)
     echomsg 'Selected target is not built: ' . target_path
-    return [build_dir, '']
+    return ['', '']
   endif
 
-  return [build_dir, target_path . ' ' . get(parameters['arguments'], target_info['name'], '')]
+  return [fnamemodify(target_path, ":h"), target_path . ' ' . get(parameters['arguments'], target_info['name'], '')]
 endfunction
 
 function! s:autoclose_quickfix(options)
