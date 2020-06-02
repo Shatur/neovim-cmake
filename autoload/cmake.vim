@@ -215,10 +215,10 @@ function! cmake#select_target() abort
     return
   endif
 
-  let fzf_spec = {'source': [], 'sink': function('s:set_current_target', [parameters]), 'options': []}
+  let fzf_spec = {'source': [], 'sink': function('s:set_current_target', [parameters])}
   let current_target = parameters['currentTarget']
   if !empty(current_target)
-    let fzf_spec['options'] += ['--header', current_target]
+    let fzf_spec['options'] = ['--header', current_target]
   endif
 
   let reply_dir = s:get_reply_dir(build_dir)
@@ -264,7 +264,7 @@ function! cmake#create_project() abort
   endif
 
   let samples = map(glob(g:cmake_samples_path . '*', v:true, v:true), 'fnamemodify(v:val, ":t")')
-  call fzf#run(fzf#wrap({'source': samples, 'sink': function('s:create_project', [project_path]), 'options': []}))
+  call fzf#run(fzf#wrap({'source': samples, 'sink': function('s:create_project', [project_path])}))
 endfunction`
 
 function! cmake#set_target_arguments() abort
