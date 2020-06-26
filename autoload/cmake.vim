@@ -163,11 +163,8 @@ function! cmake#debug() abort
     return
   endif
 
-  if !exists(':Termdebug')
-    packadd termdebug
-  endif
-
-  execute 'Termdebug ' command
+  packadd termdebug
+  execute 'TermdebugCommand! ' command
 endfunction
 
 function! cmake#clean() abort
