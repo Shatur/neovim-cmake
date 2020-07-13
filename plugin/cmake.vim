@@ -10,6 +10,7 @@ let g:cmake_configure_options = get(g:, 'cmake_configure_options', {'save': 2})
 let g:cmake_build_options = get(g:, 'cmake_build_options', {'save': 2})
 let g:cmake_run_options = get(g:, 'cmake_run_options', {})
 let g:cmake_clean_options = get(g:, 'cmake_clean_options', {})
+let g:cmake_debug_command = get(g:, 'cmake_debug_command', 'TermdebugCommand!')
 
 command! -nargs=* -complete=shellcmd CMakeConfigure call cmake#configure(<q-args>)
 command! -nargs=* -complete=shellcmd CMakeBuild call cmake#build(<q-args>)
