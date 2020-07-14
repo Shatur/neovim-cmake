@@ -176,6 +176,7 @@ function! cmake#debug() abort
     return
   endif
 
+  cclose
   execute g:cmake_debug_command . ' ' . command
 endfunction
 
