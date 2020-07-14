@@ -67,10 +67,9 @@ function! s:get_current_executable_info(parameters, build_dir) abort
   return ''
 endfunction
 
-function! s:get_current_command() abort
-  let parameters = s:get_parameters()
-  let build_dir = s:get_build_dir(parameters)
-  let target_info = s:get_current_executable_info(parameters, build_dir)
+function! s:get_current_command(parameters) abort
+  let build_dir = s:get_build_dir(a:parameters)
+  let target_info = s:get_current_executable_info(a:parameters, build_dir)
   if empty(target_info)
     return ['', '']
   endif
@@ -81,13 +80,22 @@ function! s:get_current_command() abort
     return ['', '']
   endif
 
-  return [fnamemodify(target_path, ":h"), target_path . ' ' . get(parameters['arguments'], target_info['name'], '')]
+  return [fnamemodify(target_path, ":h"), target_path . ' ' . get(a:parameters['arguments'], target_info['name'], '')]
 endfunction
 
 function! s:autoclose_quickfix(options)
   if (get(a:options, 'mode', 'async') !=? 'async')
     cclose
   endif
+endfunction
+
+function s:checkDebuggingBuildType(parameters) abort
+  let buildType = a:parameters['buildType']
+  if buildType !=? 'Debug' && buildType != 'RelWithDebInfo'
+    echomsg 'For debugging you need to use Debug or RelWithDebInfo, but currently your build type is ' . buildType
+    return v:false
+  endif
+  return v:true
 endfunction
 
 " FZF callbacks
@@ -150,7 +158,7 @@ function! cmake#build_all(additional_arguments) abort
 endfunction
 
 function! cmake#run() abort
-  let [build_dir, command] = s:get_current_command()
+  let [build_dir, command] = s:get_current_command(s:get_parameters())
   if !empty(command)
     call s:autoclose_quickfix(g:cmake_run_options)
     call asyncrun#run('', extend(g:cmake_run_options, {'cwd': build_dir}), command)
@@ -158,7 +166,12 @@ function! cmake#run() abort
 endfunction
 
 function! cmake#debug() abort
-  let [build_dir, command] = s:get_current_command()
+  let parameters = s:get_parameters()
+  if !s:checkDebuggingBuildType(parameters)
+    return
+  endif
+
+  let [build_dir, command] = s:get_current_command(parameters)
   if empty(command)
     return
   endif
@@ -184,6 +197,10 @@ endfunction
 function! cmake#build_and_debug(additional_arguments) abort
   let parameters = s:get_parameters()
   if empty(s:get_current_executable_info(parameters, s:get_build_dir(parameters)))
+    return
+  endif
+
+  if !s:checkDebuggingBuildType(parameters)
     return
   endif
 
