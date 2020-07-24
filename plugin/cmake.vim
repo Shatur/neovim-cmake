@@ -4,7 +4,7 @@ endif
 let g:loaded_cmake_projects = v:true
 
 let g:cmake_parameters_file = get(g:, 'cmake_parameters_file', 'vim.json')
-let g:cmake_samples_path = get(g:, 'cmake_samples_path', expand('<sfile>:p:h:h') . '/samples/')
+let g:cmake_samples_path = get(g:, 'cmake_samples_path', expand('<sfile>:p:h:h') .. '/samples/')
 let g:default_cmake_projects_path = get(g:, 'default_cmake_projects_path', expand('~/Projects'))
 let g:cmake_configure_options = get(g:, 'cmake_configure_options', {'save': 2})
 let g:cmake_build_options = get(g:, 'cmake_build_options', {'save': 2})

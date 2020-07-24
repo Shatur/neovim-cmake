@@ -11,11 +11,11 @@ function! s:set_parameters(parameters) abort
 endfunction
 
 function! s:get_build_dir(parameters) abort
-  return getcwd() . '-' . a:parameters['buildType'] . '-build/'
+  return getcwd() .. '-' .. a:parameters['buildType'] .. '-build/'
 endfunction
 
 function! s:get_reply_dir(build_dir) abort
-  return a:build_dir . '.cmake/api/v1/reply/'
+  return a:build_dir .. '.cmake/api/v1/reply/'
 endfunction
 
 function! s:get_codemodel_targets(reply_dir) abort
@@ -24,15 +24,15 @@ function! s:get_codemodel_targets(reply_dir) abort
 endfunction
 
 function! s:get_target_info(reply_dir, codemodel_target) abort
-    return json_decode(readfile(a:reply_dir . a:codemodel_target['jsonFile']))
+    return json_decode(readfile(a:reply_dir .. a:codemodel_target['jsonFile']))
 endfunction
 
 " Tell CMake to generate codemodel
 function! s:make_query_files(build_dir) abort
-  let query_dir = a:build_dir . '.cmake/api/v1/query/'
+  let query_dir = a:build_dir .. '.cmake/api/v1/query/'
   call mkdir(query_dir, 'p')
 
-  let codemodel_file = query_dir . 'codemodel-v2'
+  let codemodel_file = query_dir .. 'codemodel-v2'
   if !filereadable(codemodel_file)
     call writefile([], codemodel_file)
   endif
@@ -57,13 +57,13 @@ function! s:get_current_executable_info(parameters, build_dir) abort
     endif
     let target_info = s:get_target_info(reply_dir, target)
     if target_info['type'] !=? 'EXECUTABLE'
-      echomsg 'Specified target is not executable: ' . target_name
+      echomsg 'Specified target is not executable: ' .. target_name
       return ''
     endif
     return target_info
   endfor
 
-  echomsg 'Unable to find the following target: ' . target_name
+  echomsg 'Unable to find the following target: ' .. target_name
   return ''
 endfunction
 
@@ -74,13 +74,13 @@ function! s:get_current_command(parameters) abort
     return ['', '']
   endif
 
-  let target_path = build_dir . target_info['artifacts'][0]['path']
+  let target_path = build_dir .. target_info['artifacts'][0]['path']
   if !filereadable(target_path)
-    echomsg 'Selected target is not built: ' . target_path
+    echomsg 'Selected target is not built: ' .. target_path
     return ['', '']
   endif
 
-  return [fnamemodify(target_path, ":h"), target_path . ' ' . get(a:parameters['arguments'], target_info['name'], '')]
+  return [fnamemodify(target_path, ":h"), target_path .. ' ' .. get(a:parameters['arguments'], target_info['name'], '')]
 endfunction
 
 function! s:autoclose_quickfix(options)
@@ -92,7 +92,7 @@ endfunction
 function s:checkDebuggingBuildType(parameters) abort
   let buildType = a:parameters['buildType']
   if buildType !=? 'Debug' && buildType != 'RelWithDebInfo'
-    echomsg 'For debugging you need to use Debug or RelWithDebInfo, but currently your build type is ' . buildType
+    echomsg 'For debugging you need to use Debug or RelWithDebInfo, but currently your build type is ' .. buildType
     return v:false
   endif
   return v:true
@@ -110,13 +110,13 @@ function! s:set_build_type(parameters, build_type) abort
 endfunction
 
 function! s:create_project(project_path, project_type) abort
-  let output = system('cp -r "' . g:cmake_samples_path . a:project_type . '" "' . a:project_path . '"')
+  let output = system('cp -r "' .. g:cmake_samples_path .. a:project_type .. '" "' .. a:project_path .. '"')
   if !empty(output)
     echomsg output
     return
   endif
 
-  execute 'edit ' . a:project_path . '/CMakeLists.txt'
+  execute 'edit ' .. a:project_path .. '/CMakeLists.txt'
   cd %:h
 endfunction
 
@@ -135,8 +135,8 @@ function! cmake#configure(additional_arguments) abort
   let build_dir = s:get_build_dir(parameters)
   call mkdir(build_dir, 'p')
   call s:make_query_files(build_dir)
-  call asyncrun#run('', g:cmake_configure_options, 'cmake ' . a:additional_arguments . ' -D CMAKE_BUILD_TYPE=' . parameters['buildType'] . ' -D CMAKE_EXPORT_COMPILE_COMMANDS=1 -B ' . build_dir
-        \ . ' && ln -sf ' . fnamemodify(build_dir, ':.') . 'compile_commands.json')
+  call asyncrun#run('', g:cmake_configure_options, 'cmake ' .. a:additional_arguments .. ' -D CMAKE_BUILD_TYPE=' .. parameters['buildType'] .. ' -D CMAKE_EXPORT_COMPILE_COMMANDS=1 -B ' .. build_dir
+        \ .. ' && ln -sf ' .. fnamemodify(build_dir, ':.') .. 'compile_commands.json')
 endfunction
 
 function! cmake#build(additional_arguments) abort
@@ -148,13 +148,13 @@ function! cmake#build(additional_arguments) abort
   endif
 
   call s:autoclose_quickfix(g:cmake_build_options)
-  call asyncrun#run('', g:cmake_build_options, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters) . ' --target ' . target_name)
+  call asyncrun#run('', g:cmake_build_options, 'cmake ' .. a:additional_arguments .. ' --build ' .. s:get_build_dir(parameters) .. ' --target ' .. target_name)
 endfunction
 
 function! cmake#build_all(additional_arguments) abort
   let parameters = s:get_parameters()
   call s:autoclose_quickfix(g:cmake_build_options)
-  call asyncrun#run('', g:cmake_build_options, 'cmake ' . a:additional_arguments . ' --build ' . s:get_build_dir(parameters))
+  call asyncrun#run('', g:cmake_build_options, 'cmake ' .. a:additional_arguments .. ' --build ' .. s:get_build_dir(parameters))
 endfunction
 
 function! cmake#run() abort
@@ -177,12 +177,12 @@ function! cmake#debug() abort
   endif
 
   cclose
-  execute g:cmake_debug_command . ' ' . command
+  execute g:cmake_debug_command .. ' ' .. command
 endfunction
 
 function! cmake#clean() abort
   call s:autoclose_quickfix(g:cmake_clean_options)
-  call asyncrun#run('', g:cmake_clean_options, 'cmake --build ' . cmake#get_build_dir() . ' --target clean')
+  call asyncrun#run('', g:cmake_clean_options, 'cmake --build ' .. cmake#get_build_dir() .. ' --target clean')
 endfunction
 
 function! cmake#build_and_run(additional_arguments) abort
@@ -241,7 +241,7 @@ function! cmake#select_target() abort
     let target_name = target_info['name']
     let target_type = target_info['type']
     if target_type !=? 'UTILITY' && target_name !=? current_target
-      call add(fzf_spec['source'], target_name . ' (' . tolower(target_type) . ')')
+      call add(fzf_spec['source'], target_name .. ' (' .. tolower(target_type) .. ')')
     endif
   endfor
 
@@ -266,18 +266,18 @@ function! cmake#create_project() abort
 
   " Concatenate received data
   if strcharpart(project_location, strlen(project_location) - 1) ==? '/'
-    let project_path = expand(project_location) . project_name
+    let project_path = expand(project_location) .. project_name
   else
-    let project_path = expand(project_location) . '/' . project_name
+    let project_path = expand(project_location) .. '/' .. project_name
   endif
 
   if !empty(glob(project_path))
     redraw
-    echomsg 'Path ' . project_path . ' is already exists'
+    echomsg 'Path ' .. project_path .. ' is already exists'
     return
   endif
 
-  let samples = map(glob(g:cmake_samples_path . '*', v:true, v:true), 'fnamemodify(v:val, ":t")')
+  let samples = map(glob(g:cmake_samples_path .. '*', v:true, v:true), 'fnamemodify(v:val, ":t")')
   call fzf#run(fzf#wrap({'source': samples, 'sink': function('s:create_project', [project_path])}))
 endfunction`
 
@@ -289,7 +289,7 @@ function! cmake#set_target_arguments() abort
   endif
 
   let current_target_name = current_target['name']
-  let parameters['arguments'][current_target_name] = input(current_target_name . ' arguments: ', get(parameters['arguments'], current_target_name, ''))
+  let parameters['arguments'][current_target_name] = input(current_target_name .. ' arguments: ', get(parameters['arguments'], current_target_name, ''))
   call s:set_parameters(parameters)
 endfunction
 
@@ -299,5 +299,5 @@ function! cmake#open_build_dir() abort
   else
     let program = 'xdg-open '
   endif
-  call system(program . cmake#get_build_dir())
+  call system(program .. cmake#get_build_dir())
 endfunction
