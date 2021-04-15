@@ -85,7 +85,7 @@ function cmake.build_and_run(...)
     return
   end
 
-  vim.cmd('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | lua requie("cmake").run() | endif')
+  vim.cmd('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | call luaeval("require(\'cmake\').run()") | endif')
   cmake.build(...)
 end
 
@@ -99,7 +99,7 @@ function cmake.build_and_debug(...)
     return
   end
 
-  vim.cmd('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | lua requie("cmake").debug() | endif')
+  vim.cmd('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | call luaeval("require(\'cmake\').debug()") | endif')
   cmake.build(...)
 end
 
