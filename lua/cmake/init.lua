@@ -71,6 +71,7 @@ function cmake.debug(...)
     cwd = target_dir,
   }
   dap.run(config)
+  dap.repl.open()
 end
 
 function cmake.clean(...)
