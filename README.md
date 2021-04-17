@@ -5,9 +5,13 @@ A Neovim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/ma
 ## Dependencies
 
 - [cmake](https://cmake.org) for building and reading project information.
-- [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) to select targets and build types.
+- [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) to select targets, build types and samples.
 - [AsyncRun](https://github.com/skywind3000/asyncrun.vim) to run all tasks asynchronously.
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap) for debugging.
+
+## Setup
+
+To make CMake telescope pickers available you should call `require('telescope').load_extension('cmake')`.
 
 ## Commands
 
@@ -23,15 +27,22 @@ Use the command `:CMake` with one of the following arguments:
 | `clean ...`            | Execute `clear` target. Additional arguments will be passed to CMake.                                                                                                                                                                                                    |
 | `build_and_run ...`    | Execute `CMake build` and, if build successful, then `CMake run`. Additional arguments will be passed to CMake.                                                                                                                                                          |
 | `build_and_debug ...`  | Execute `CMake build` and, if build successful, then `CMake debug`. Additional arguments will be passed to CMake.                                                                                                                                                        |
-| `select_build_type`    | Select build type (Release, Debug, etc.).                                                                                                                                                                                                                                |
-| `select_target`        | Select target for running / debugging.                                                                                                                                                                                                                                   |
-| `create_project`       | Create new CMake project.                                                                                                                                                                                                                                                |
 | `set_target_arguments` | Set arguments for running / debugging target.                                                                                                                                                                                                                            |
 | `open_build_dir`       | Open current build folder via `xdg-open` (Linux) or `start` (Windows).                                                                                                                                                                                                   |
 
 If no arguments are specified, then `configure` will be executed.
 
 Also the corresponding Lua functions with the same names as the arguments are available from [require('cmake')](lua/cmake/init.lua).
+
+Use `:Telescope cmake` with one for the following arguments:
+
+| Argument            | Description                               |
+| ------------------- | ----------------------------------------- |
+| `select_build_type` | Select build type (Release, Debug, etc.). |
+| `select_target`     | Select target for running / debugging.    |
+| `create_project`    | Create new CMake project.                 |
+
+Also the corresponding Lua functions with the same names as the arguments are available from [require('telescope').extensions.cmake](lua/telescope/_extensions/cmake.lua).
 
 ## Parameters
 
@@ -46,7 +57,7 @@ Also the corresponding Lua functions with the same names as the arguments are av
 
 ## Simple usage example
 
-1. Create a new project (`:CMake create_project`) or open an existing.
+1. Create a new project (`:Telescope cmake create_project`) or open an existing.
 2. Configure project (`:CMake configure`) to create build folder and get targets information
-3. Select target to execute (`:CMake select_target`).
+3. Select target to execute (`:Telescope select_target`).
 4. Build and run (`:CMake build_and_run`)
