@@ -152,9 +152,9 @@ function cmake.select_target()
     local target_type = target_info['type']
     if target_type ~= 'UTILITY' then
       if target_name == current_target then
-        table.insert(targets, 1, target_name .. ' (' .. vim.fn.tolower(target_type) .. ')')
+        table.insert(targets, 1, {name = target_name, type = target_type:lower()})
       else
-        table.insert(targets, target_name .. ' (' .. vim.fn.tolower(target_type) .. ')')
+        table.insert(targets, {name = target_name, type = target_type:lower()})
       end
     end
   end
@@ -162,14 +162,20 @@ function cmake.select_target()
   pickers.new({}, {
     prompt_title = 'Select target',
     finder = finders.new_table {
-      results = targets
+      results = targets,
+      entry_maker = function(entry)
+        return {
+          value = entry.name,
+          display = entry.name .. ' (' .. entry.type .. ')',
+          ordinal = entry.name .. ' (' .. entry.type .. ')'
+        }
+      end
     },
     sorter = sorters.get_fzy_sorter(),
     attach_mappings = function(prompt_bufnr, map)
       local set_build_type = function()
         actions.close(prompt_bufnr)
-        local value = actions.get_selected_entry(prompt_bufnr).display
-        parameters['currentTarget'] = vim.fn.strpart(value, 0, vim.fn.stridx(value, ' '))
+        parameters['currentTarget'] = actions.get_selected_entry(prompt_bufnr).value
         utils.set_parameters(parameters)
       end
 
