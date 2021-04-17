@@ -203,7 +203,7 @@ function cmake.create_project()
     return
   end
 
-  local samples = vim.fn.map(vim.fn.glob(vim.g.cmake_samples_path .. '*', true, true), 'fnamemodify(v:val, ":t")')
+  local samples = vim.fn.map(vim.fn.readdir(vim.g.cmake_samples_path), 'fnamemodify(v:val, ":t")')
   pickers.new({}, {
     prompt_title = 'Select sample',
     finder = finders.new_table {
