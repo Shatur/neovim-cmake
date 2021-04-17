@@ -23,14 +23,14 @@ local function select_build_type()
       results = types
     },
     sorter = sorters.get_fzy_sorter(),
-    attach_mappings = function(prompt_bufnr, map)
-      local set_build_type = function()
+    attach_mappings = function(prompt_bufnr)
+      local select = function()
         actions.close(prompt_bufnr)
         parameters['buildType'] = actions.get_selected_entry(prompt_bufnr).display
         utils.set_parameters(parameters)
       end
 
-      map('i', '<CR>', set_build_type)
+      actions.select_default:replace(select)
       return true
     end,
   }):find()
@@ -72,14 +72,14 @@ local function select_target()
       end
     },
     sorter = sorters.get_fzy_sorter(),
-    attach_mappings = function(prompt_bufnr, map)
-      local set_build_type = function()
+    attach_mappings = function(prompt_bufnr)
+      local select = function()
         actions.close(prompt_bufnr)
         parameters['currentTarget'] = actions.get_selected_entry(prompt_bufnr).value
         utils.set_parameters(parameters)
       end
 
-      map('i', '<CR>', set_build_type)
+      actions.select_default:replace(select)
       return true
     end,
   }):find()
@@ -116,8 +116,8 @@ local function create_project()
       results = samples
     },
     sorter = sorters.get_fzy_sorter(),
-    attach_mappings = function(prompt_bufnr, map)
-      local set_build_type = function()
+    attach_mappings = function(prompt_bufnr)
+      local select = function()
         actions.close(prompt_bufnr)
         local sample_name = actions.get_selected_entry(prompt_bufnr).display
         local output = vim.fn.system('cp -r "' .. vim.g.cmake_samples_path .. sample_name .. '" "' .. project_path .. '"')
@@ -130,7 +130,7 @@ local function create_project()
         vim.cmd('cd %:h')
       end
 
-      map('i', '<CR>', set_build_type)
+      actions.select_default:replace(select)
       return true
     end,
   }):find()
