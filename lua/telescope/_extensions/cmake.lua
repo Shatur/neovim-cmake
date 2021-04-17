@@ -52,9 +52,9 @@ local function select_target()
     local target_type = target_info['type']
     if target_type ~= 'UTILITY' then
       if target_name == current_target then
-        table.insert(targets, 1, {name = target_name, type = target_type:lower()})
+        table.insert(targets, 1, {name = target_name, type = target_type:lower():gsub('_', ' ')})
       else
-        table.insert(targets, {name = target_name, type = target_type:lower()})
+        table.insert(targets, {name = target_name, type = target_type:lower():gsub('_', ' ')})
       end
     end
   end
