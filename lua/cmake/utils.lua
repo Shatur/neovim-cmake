@@ -97,7 +97,7 @@ function utils.autoclose_quickfix(options)
   end
 end
 
-function utils.checkDebuggingBuildType(parameters)
+function utils.check_debugging_build_type(parameters)
   local buildType = parameters['buildType']
   if buildType ~= 'Debug' and buildType ~= 'RelWithDebInfo' then
     print('For debugging you need to use Debug or RelWithDebInfo, but currently your build type is ' .. buildType)

@@ -48,7 +48,7 @@ end
 
 function cmake.debug(...)
   local parameters = utils.get_parameters()
-  if not utils.checkDebuggingBuildType(parameters) then
+  if not utils.check_debugging_build_type(parameters) then
     return
   end
 
@@ -92,7 +92,7 @@ function cmake.build_and_debug(...)
     return
   end
 
-  if not utils.checkDebuggingBuildType(parameters) then
+  if not utils.check_debugging_build_type(parameters) then
     return
   end
 
