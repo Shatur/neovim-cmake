@@ -8,7 +8,7 @@ function cmake.configure(...)
     return
   end
 
-  local additional_arguments = table.concat({...}, ' ')
+  local additional_arguments = table.concat({vim.g.cmake_configure_arguments, ...}, ' ')
   local parameters = utils.get_parameters()
   local build_dir = utils.get_build_dir(parameters)
   vim.fn.mkdir(build_dir, 'p')

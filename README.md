@@ -48,10 +48,11 @@ Also the corresponding Lua functions with the same names as the arguments are av
 
 | Variable                          | Default value                           | Description                                                                                                                       |
 | --------------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `g:loaded_cmake`         | `v:true`                                | Set this value to `v:false` to disable plugin loading.                                                                            |
+| `g:loaded_cmake`                  | `v:true`                                | Set this value to `v:false` to disable plugin loading.                                                                            |
 | `g:cmake_parameters_file`         | `'vim.json'`                            | JSON file to store information about selected target, run arguments and build type. `vim.json` (in project directory) by default. |
 | `g:cmake_samples_path`            | `expand('<sfile>:p:h:h') . '/samples/'` | Folder with samples. `samples` folder from the plugin directory is used by default.                                               |
 | `g:default_cmake_projects_path`   | `expand('~/Projects')`                  | Default folder for creating project.                                                                                              |
+| `g:cmake_configure_arguments`     | `''`                                    | Default arguments that will be always passed at cmake configure step. Exaple: `vim.g.cmake_configure_arguments = '-G Ninja'`.     |
 | `g:cmake_asyncrun_options`        | `{'save': 2}`                           | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed on cmake execution.                    |
 | `g:cmake_target_asyncrun_options` | `{}`                                    | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed on target execution.                   |
 
