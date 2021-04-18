@@ -3,7 +3,7 @@ if exists('g:loaded_cmake')
 endif
 let g:loaded_cmake = v:true
 
-let g:cmake_parameters_file = get(g:, 'cmake_parameters_file', 'vim.json')
+let g:cmake_parameters_file = get(g:, 'cmake_parameters_file', 'neovim.json')
 let g:cmake_samples_path = get(g:, 'cmake_samples_path', expand('<sfile>:p:h:h') .. '/samples/')
 let g:default_cmake_projects_path = get(g:, 'default_cmake_projects_path', expand('~/Projects'))
 let g:cmake_configure_arguments = get(g:, 'cmake_configure_arguments', '')
