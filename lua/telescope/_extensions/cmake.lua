@@ -5,7 +5,7 @@ local finders = require('telescope.finders')
 local sorters = require('telescope.sorters')
 local utils = require('cmake.utils')
 
-local function select_build_type()
+local function select_build_type(opts)
   local parameters = utils.get_parameters()
   local current_build_type = parameters['buildType']
   local types = {}
@@ -17,7 +17,7 @@ local function select_build_type()
     end
   end
 
-  pickers.new({}, {
+  pickers.new(opts, {
     prompt_title = 'Select build type',
     finder = finders.new_table {
       results = types
@@ -35,7 +35,8 @@ local function select_build_type()
     end,
   }):find()
 end
-local function select_target()
+
+local function select_target(opts)
   local parameters = utils.get_parameters()
   local build_dir = utils.get_build_dir(parameters)
   if vim.fn.isdirectory(build_dir) ~= 1 then
@@ -59,7 +60,7 @@ local function select_target()
     end
   end
 
-  pickers.new({}, {
+  pickers.new(opts, {
     prompt_title = 'Select target',
     finder = finders.new_table {
       results = targets,
