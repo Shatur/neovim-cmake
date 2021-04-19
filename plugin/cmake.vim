@@ -7,7 +7,7 @@ let g:cmake_parameters_file = get(g:, 'cmake_parameters_file', 'neovim.json')
 let g:cmake_build_dir = get(g:, 'cmake_build_dir', '{cwd}-{os}-{build_type}-build')
 let g:cmake_samples_path = get(g:, 'cmake_samples_path', expand('<sfile>:p:h:h') .. '/samples/')
 let g:default_cmake_projects_path = get(g:, 'default_cmake_projects_path', expand('~/Projects'))
-let g:cmake_configure_arguments = get(g:, 'cmake_configure_arguments', '')
+let g:cmake_configure_arguments = get(g:, 'cmake_configure_arguments', '-D CMAKE_EXPORT_COMPILE_COMMANDS=1')
 let g:cmake_asyncrun_options = get(g:, 'cmake_asyncrun_options', {'save': 2})
 let g:cmake_target_asyncrun_options = get(g:, 'cmake_target_asyncrun_options', {})
 

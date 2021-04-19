@@ -13,7 +13,8 @@ function cmake.configure(...)
   local build_dir = utils.get_build_dir(parameters)
   vim.fn.mkdir(build_dir, 'p')
   utils.make_query_files(build_dir)
-  vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. ' -D CMAKE_BUILD_TYPE=' .. parameters['buildType'] .. ' -D CMAKE_EXPORT_COMPILE_COMMANDS=1 -B ' .. build_dir .. ' && ln -sf ' .. vim.fn.fnamemodify(build_dir, ':.') .. 'compile_commands.json')
+  utils.asyncrun_callback('require(\'cmake.utils\').autocopy_compile_commands()')
+  vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. ' -D CMAKE_BUILD_TYPE=' .. parameters['buildType'] .. ' -B ' .. build_dir)
 end
 
 function cmake.build(...)
@@ -26,12 +27,14 @@ function cmake.build(...)
 
   local additional_arguments = table.concat({...}, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
+  utils.asyncrun_callback('require(\'cmake.utils\').autocopy_compile_commands()')
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. ' --build ' .. utils.get_build_dir(parameters) .. ' --target ' .. target_name)
 end
 
 function cmake.build_all(...)
   local additional_arguments = table.concat({...}, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
+  utils.asyncrun_callback('require(\'cmake.utils\').autocopy_compile_commands()')
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. ' --build ' .. utils.get_build_dir())
 end
 
@@ -73,6 +76,7 @@ end
 function cmake.clean(...)
   local additional_arguments = table.concat({...}, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
+  utils.asyncrun_callback('require(\'cmake.utils\').autocopy_compile_commands()')
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. '--build ' .. utils.get_build_dir() .. ' --target clean')
 end
 
@@ -82,7 +86,7 @@ function cmake.build_and_run(...)
     return
   end
 
-  vim.cmd('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | call luaeval("require(\'cmake\').run()") | endif')
+  utils.asyncrun_callback('require(\'cmake\').run()')
   cmake.build(...)
 end
 
@@ -96,7 +100,7 @@ function cmake.build_and_debug(...)
     return
   end
 
-  vim.cmd('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | call luaeval("require(\'cmake\').debug()") | endif')
+  utils.asyncrun_callback('require(\'cmake\').debug()')
   cmake.build(...)
 end
 

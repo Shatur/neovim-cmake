@@ -110,6 +110,20 @@ function utils.get_current_command(parameters)
   return target_dir, command
 end
 
+function utils.asyncrun_callback(function_string)
+  vim.cmd('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | call luaeval("' .. function_string .. '") | endif')
+end
+
+function utils.autocopy_compile_commands()
+  local generated_commands = io.open(utils.get_build_dir() .. '/compile_commands.json')
+  if not generated_commands then
+    return
+  end
+
+  local output_commands = assert(io.open(vim.fn.getcwd() .. '/compile_commands.json', 'w'))
+  output_commands:write(generated_commands:read('*all'))
+end
+
 function utils.autoclose_quickfix(options)
   if vim.fn.get(options, 'mode', 'async') ~= 'async' then
     vim.cmd('cclose')
