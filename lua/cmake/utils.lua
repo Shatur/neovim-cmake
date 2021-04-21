@@ -114,14 +114,23 @@ function utils.asyncrun_callback(function_string)
   vim.cmd('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | call luaeval("' .. function_string .. '") | endif')
 end
 
-function utils.autocopy_compile_commands()
-  local generated_commands = io.open(utils.get_build_dir() .. '/compile_commands.json')
-  if not generated_commands then
-    return
-  end
+function utils.copy_compile_commands()
+  vim.loop.fs_copyfile(utils.get_build_dir() .. '/compile_commands.json', vim.fn.getcwd() .. '/compile_commands.json')
+end
 
-  local output_commands = assert(io.open(vim.fn.getcwd() .. '/compile_commands.json', 'w'))
-  output_commands:write(generated_commands:read('*all'))
+function utils.copy_folder(folder, destination)
+  vim.fn.mkdir(destination, 'p')
+  for _, entry in ipairs(vim.fn.readdir(folder)) do
+    local source_entry = folder .. '/' .. entry
+    local target_entry = destination .. '/' .. entry
+    if vim.fn.isdirectory(source_entry) ~= 1 then
+      if not vim.loop.fs_copyfile(source_entry, target_entry) then
+        error('Unable to copy ' .. target_entry)
+      end
+    else
+      utils.copy_folder(source_entry, target_entry)
+    end
+  end
 end
 
 function utils.autoclose_quickfix(options)

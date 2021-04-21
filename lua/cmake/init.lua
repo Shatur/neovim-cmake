@@ -13,7 +13,7 @@ function cmake.configure(...)
   local build_dir = utils.get_build_dir(parameters)
   vim.fn.mkdir(build_dir, 'p')
   utils.make_query_files(build_dir)
-  utils.asyncrun_callback('require(\'cmake.utils\').autocopy_compile_commands()')
+  utils.asyncrun_callback('require(\'cmake.utils\').copy_compile_commands()')
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. ' -D CMAKE_BUILD_TYPE=' .. parameters['buildType'] .. ' -B ' .. build_dir)
 end
 
@@ -27,14 +27,14 @@ function cmake.build(...)
 
   local additional_arguments = table.concat({...}, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
-  utils.asyncrun_callback('require(\'cmake.utils\').autocopy_compile_commands()')
+  utils.asyncrun_callback('require(\'cmake.utils\').copy_compile_commands()')
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. ' --build ' .. utils.get_build_dir(parameters) .. ' --target ' .. target_name)
 end
 
 function cmake.build_all(...)
   local additional_arguments = table.concat({...}, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
-  utils.asyncrun_callback('require(\'cmake.utils\').autocopy_compile_commands()')
+  utils.asyncrun_callback('require(\'cmake.utils\').copy_compile_commands()')
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. ' --build ' .. utils.get_build_dir())
 end
 
@@ -76,7 +76,7 @@ end
 function cmake.clean(...)
   local additional_arguments = table.concat({...}, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
-  utils.asyncrun_callback('require(\'cmake.utils\').autocopy_compile_commands()')
+  utils.asyncrun_callback('require(\'cmake.utils\').copy_compile_commands()')
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. '--build ' .. utils.get_build_dir() .. ' --target clean')
 end
 

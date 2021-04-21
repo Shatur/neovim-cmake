@@ -120,13 +120,7 @@ local function create_project()
     attach_mappings = function(prompt_bufnr)
       local select = function()
         actions.close(prompt_bufnr)
-        local sample_name = actions.get_selected_entry(prompt_bufnr).display
-        local output = vim.fn.system('cp -r "' .. vim.g.cmake_samples_path .. sample_name .. '" "' .. project_path .. '"')
-        if #output ~= 0 then
-          print(output)
-          return
-        end
-
+        utils.copy_folder(vim.g.cmake_samples_path .. actions.get_selected_entry(prompt_bufnr).display, project_path)
         vim.cmd('edit ' .. project_path .. '/CMakeLists.txt')
         vim.cmd('cd %:h')
       end
