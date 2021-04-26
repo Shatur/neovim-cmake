@@ -116,6 +116,20 @@ function cmake.set_target_arguments()
   utils.set_parameters(parameters)
 end
 
+function cmake.clear_cache()
+  local cache_file = utils.get_build_dir() .. 'CMakeCache.txt'
+  if vim.fn.filereadable(cache_file) ~= 1 then
+    print('Cache file ' .. cache_file .. ' does not exists')
+    return
+  end
+
+  if vim.fn.delete(cache_file) == 0 then
+    print('Cache file '  .. cache_file .. ' was deleted successfully')
+  else
+    print('Unable to delete cache file '  .. cache_file)
+  end
+end
+
 function cmake.open_build_dir()
   local program = vim.fn.has('win32') == 1 and 'start ' or 'xdg-open '
   vim.fn.system(program .. utils.get_build_dir())
