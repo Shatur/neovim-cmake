@@ -28,14 +28,14 @@ function cmake.build(...)
   local additional_arguments = table.concat({...}, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
   utils.asyncrun_callback('require(\'cmake.utils\').copy_compile_commands()')
-  vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. ' --build ' .. utils.get_build_dir(parameters) .. ' --target ' .. target_name)
+  vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake  --build ' .. utils.get_build_dir(parameters) .. ' --target ' .. target_name .. ' ' .. additional_arguments)
 end
 
 function cmake.build_all(...)
   local additional_arguments = table.concat({...}, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
   utils.asyncrun_callback('require(\'cmake.utils\').copy_compile_commands()')
-  vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake ' .. additional_arguments .. ' --build ' .. utils.get_build_dir())
+  vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, 'cmake  --build ' .. utils.get_build_dir() .. ' ' .. additional_arguments)
 end
 
 function cmake.run(...)
