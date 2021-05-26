@@ -116,7 +116,7 @@ function cmake.set_target_arguments()
   end
 
   local current_target_name = current_target['name']
-  parameters['arguments'][current_target_name] = vim.fn.input(current_target_name .. ' arguments: ', vim.fn.get(parameters['arguments'], current_target_name, ''))
+  parameters['arguments'][current_target_name] = vim.fn.input(current_target_name .. ' arguments: ', vim.fn.get(parameters['arguments'], current_target_name), 'file')
   utils.set_parameters(parameters)
 end
 
