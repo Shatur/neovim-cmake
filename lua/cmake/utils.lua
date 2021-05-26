@@ -89,25 +89,22 @@ function utils.get_current_executable_info(parameters, build_dir)
   return nil
 end
 
-function utils.get_current_command(parameters)
+function utils.get_current_target(parameters)
   local build_dir = utils.get_build_dir(parameters)
   local target_info = utils.get_current_executable_info(parameters, build_dir)
   if not target_info then
     return nil, nil
   end
 
-  local command = build_dir .. target_info['artifacts'][1]['path']
-  if vim.fn.filereadable(command) ~= 1 then
-    print('Selected target is not built: ' .. command)
+  local target = build_dir .. target_info['artifacts'][1]['path']
+  if vim.fn.filereadable(target) ~= 1 then
+    print('Selected target is not built: ' .. target)
     return nil, nil
   end
 
-  local target_dir = vim.fn.fnamemodify(command, ":h")
+  local target_dir = vim.fn.fnamemodify(target, ":h")
   local arguments = parameters['arguments'][target_info['name']]
-  if arguments then
-    command = command .. ' ' .. arguments
-  end
-  return target_dir, command
+  return target_dir, target, arguments
 end
 
 function utils.asyncrun_callback(function_string)
