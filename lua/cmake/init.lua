@@ -10,10 +10,10 @@ function cmake.configure(...)
 
   local parameters = utils.get_parameters()
   local build_dir = utils.get_build_dir(parameters)
-  local command = table.concat({'cmake', vim.g.cmake_configure_arguments, table.concat({...}, ' '), '-D', 'CMAKE_BUILD_TYPE=' .. parameters['buildType'], '-B', build_dir}, ' ')
+  local command = table.concat({ 'cmake', vim.g.cmake_configure_arguments, table.concat({ ... }, ' '), '-D', 'CMAKE_BUILD_TYPE=' .. parameters['buildType'], '-B', build_dir }, ' ')
   vim.fn.mkdir(build_dir, 'p')
   utils.make_query_files(build_dir)
-  utils.asyncrun_callback('require(\'cmake.utils\').copy_compile_commands()')
+  utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, command)
 end
 
@@ -25,16 +25,16 @@ function cmake.build(...)
     return
   end
 
-  local command = table.concat({'cmake', '--build', utils.get_build_dir(parameters), '--target', target_name, ...}, ' ')
+  local command = table.concat({ 'cmake', '--build', utils.get_build_dir(parameters), '--target', target_name, ... }, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
-  utils.asyncrun_callback('require(\'cmake.utils\').copy_compile_commands()')
+  utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, command)
 end
 
 function cmake.build_all(...)
-  local command = table.concat({'cmake', '--build', utils.get_build_dir(), ...}, ' ')
+  local command = table.concat({ 'cmake', '--build', utils.get_build_dir(), ... }, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
-  utils.asyncrun_callback('require(\'cmake.utils\').copy_compile_commands()')
+  utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, command)
 end
 
@@ -44,9 +44,9 @@ function cmake.run(...)
     return
   end
 
-  local command = table.concat({target, arguments, ...}, ' ')
+  local command = table.concat({ target, arguments, ... }, ' ')
   utils.autoclose_quickfix(vim.g.cmake_target_asyncrun_options)
-  vim.fn['asyncrun#run']('', vim.fn.extend(vim.g.cmake_target_asyncrun_options, {cwd = target_dir}), command)
+  vim.fn['asyncrun#run']('', vim.fn.extend(vim.g.cmake_target_asyncrun_options, { cwd = target_dir }), command)
 end
 
 function cmake.debug(...)
@@ -61,8 +61,8 @@ function cmake.debug(...)
   end
 
   -- Split on spaces unless in quotes
-  local splitted_args = vim.fn.split(arguments, "[^\\s\"']+|\"([^\"]*)\"|'([^']*)'")
-  table.insert(splitted_args, {...})
+  local splitted_args = vim.fn.split(arguments, '[^\\s"\']+|"([^"]*)"|\'([^\']*)\'')
+  table.insert(splitted_args, { ... })
 
   vim.cmd('cclose')
   local config = {
@@ -78,9 +78,9 @@ function cmake.debug(...)
 end
 
 function cmake.clean(...)
-  local command = table.concat({'cmake', table.concat({...}, ' '), '--build', utils.get_build_dir(), '--target', 'clean'}, ' ')
+  local command = table.concat({ 'cmake', table.concat({ ... }, ' '), '--build', utils.get_build_dir(), '--target', 'clean' }, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
-  utils.asyncrun_callback('require(\'cmake.utils\').copy_compile_commands()')
+  utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, command)
 end
 
@@ -90,7 +90,7 @@ function cmake.build_and_run(...)
     return
   end
 
-  utils.asyncrun_callback('require(\'cmake\').run()')
+  utils.asyncrun_callback("require('cmake').run()")
   cmake.build(...)
 end
 
@@ -104,7 +104,7 @@ function cmake.build_and_debug(...)
     return
   end
 
-  utils.asyncrun_callback('require(\'cmake\').debug()')
+  utils.asyncrun_callback("require('cmake').debug()")
   cmake.build(...)
 end
 
@@ -128,9 +128,9 @@ function cmake.clear_cache()
   end
 
   if vim.fn.delete(cache_file) == 0 then
-    print('Cache file '  .. cache_file .. ' was deleted successfully')
+    print('Cache file ' .. cache_file .. ' was deleted successfully')
   else
-    print('Unable to delete cache file '  .. cache_file)
+    print('Unable to delete cache file ' .. cache_file)
   end
 end
 

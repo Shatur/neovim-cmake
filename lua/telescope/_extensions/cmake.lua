@@ -9,7 +9,7 @@ local function select_build_type(opts)
   local parameters = utils.get_parameters()
   local current_build_type = parameters['buildType']
   local types = {}
-  for _, type in ipairs({'Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel'}) do
+  for _, type in ipairs({ 'Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel' }) do
     if type == current_build_type then
       table.insert(types, 1, type)
     else
@@ -19,9 +19,9 @@ local function select_build_type(opts)
 
   pickers.new(opts, {
     prompt_title = 'Select build type',
-    finder = finders.new_table {
-      results = types
-    },
+    finder = finders.new_table({
+      results = types,
+    }),
     sorter = sorters.get_fzy_sorter(),
     attach_mappings = function(prompt_bufnr)
       local select = function()
@@ -53,25 +53,25 @@ local function select_target(opts)
     local target_type = target_info['type']
     if target_type ~= 'UTILITY' then
       if target_name == current_target then
-        table.insert(targets, 1, {name = target_name, type = target_type:lower():gsub('_', ' ')})
+        table.insert(targets, 1, { name = target_name, type = target_type:lower():gsub('_', ' ') })
       else
-        table.insert(targets, {name = target_name, type = target_type:lower():gsub('_', ' ')})
+        table.insert(targets, { name = target_name, type = target_type:lower():gsub('_', ' ') })
       end
     end
   end
 
   pickers.new(opts, {
     prompt_title = 'Select target',
-    finder = finders.new_table {
+    finder = finders.new_table({
       results = targets,
       entry_maker = function(entry)
         return {
           value = entry.name,
           display = entry.name .. ' (' .. entry.type .. ')',
-          ordinal = entry.name .. ' (' .. entry.type .. ')'
+          ordinal = entry.name .. ' (' .. entry.type .. ')',
         }
-      end
-    },
+      end,
+    }),
     sorter = sorters.get_fzy_sorter(),
     attach_mappings = function(prompt_bufnr)
       local select = function()
@@ -113,9 +113,9 @@ local function create_project()
   local samples = vim.fn.map(vim.fn.readdir(vim.g.cmake_samples_path), 'fnamemodify(v:val, ":t")')
   pickers.new({}, {
     prompt_title = 'Select sample',
-    finder = finders.new_table {
-      results = samples
-    },
+    finder = finders.new_table({
+      results = samples,
+    }),
     sorter = sorters.get_fzy_sorter(),
     attach_mappings = function(prompt_bufnr)
       local select = function()
@@ -131,10 +131,10 @@ local function create_project()
   }):find()
 end
 
-return telescope.register_extension {
+return telescope.register_extension({
   exports = {
     select_build_type = select_build_type,
     select_target = select_target,
-    create_project = create_project
-  }
-}
+    create_project = create_project,
+  },
+})

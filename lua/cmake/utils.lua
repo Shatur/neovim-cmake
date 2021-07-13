@@ -16,13 +16,13 @@ end
 
 function utils.get_parameters()
   if vim.fn.filereadable(vim.g.cmake_parameters_file) ~= 1 then
-    return {currentTarget = '', buildType = 'Debug', arguments = {}}
+    return { currentTarget = '', buildType = 'Debug', arguments = {} }
   end
   return vim.fn.json_decode(vim.fn.readfile(vim.g.cmake_parameters_file))
 end
 
 function utils.set_parameters(parameters)
-  vim.fn.writefile({vim.fn.json_encode(parameters)}, vim.g.cmake_parameters_file)
+  vim.fn.writefile({ vim.fn.json_encode(parameters) }, vim.g.cmake_parameters_file)
 end
 
 function utils.get_build_dir(parameters)
@@ -102,7 +102,7 @@ function utils.get_current_target(parameters)
     return nil, nil
   end
 
-  local target_dir = vim.fn.fnamemodify(target, ":h")
+  local target_dir = vim.fn.fnamemodify(target, ':h')
   local arguments = parameters['arguments'][target_info['name']]
   return target_dir, target, arguments
 end
