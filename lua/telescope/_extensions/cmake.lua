@@ -50,8 +50,8 @@ local function select_target(opts)
   for _, target in ipairs(utils.get_codemodel_targets(reply_dir)) do
     local target_info = utils.get_target_info(reply_dir, target)
     local target_name = target_info['name']
-    local target_type = target_info['type']
-    if target_type ~= 'UTILITY' then
+    if target_name:find('_autogen') == nil then
+      local target_type = target_info['type']
       if target_name == current_target then
         table.insert(targets, 1, { name = target_name, type = target_type:lower():gsub('_', ' ') })
       else
