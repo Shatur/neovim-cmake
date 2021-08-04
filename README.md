@@ -64,3 +64,14 @@ Also the corresponding Lua functions with the same names as the arguments are av
 2. Configure project (`:CMake configure`) to create build folder and get targets information
 3. Select target to execute (`:Telescope select_target`).
 4. Build and run (`:CMake build_and_run`)
+
+## MSVC x64 configuration example
+
+Here we defined a [command modifier](https://github.com/skywind3000/asyncrun.vim#command-modifier) and specified it in `g:cmake_asyncrun_options`:
+
+```lua
+vim.g.asyncrun_program = vim.empty_dict()
+-- Should be done via cmd in Lua because lambda cannot be stored in a variable (https://github.com/nanotee/nvim-lua-guide#conversion-is-not-always-possible)
+vim.cmd("let g:asyncrun_program.vcvars64 = { opts -> '\"C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvars64.bat\" && ' .. opts.cmd }")
+vim.g.cmake_asyncrun_options = vim.tbl_extend('force', vim.g.cmake_asyncrun_options, {program = 'vcvars64'})
+```
