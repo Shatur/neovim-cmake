@@ -46,7 +46,7 @@ function cmake.run(...)
 
   local command = table.concat({ target, arguments, ... }, ' ')
   utils.autoclose_quickfix(vim.g.cmake_target_asyncrun_options)
-  vim.fn['asyncrun#run']('', vim.fn.extend(vim.g.cmake_target_asyncrun_options, { cwd = target_dir }), command)
+  vim.fn['asyncrun#run']('', vim.tbl_extend('force', { cwd = target_dir }, vim.g.cmake_target_asyncrun_options), command)
 end
 
 function cmake.debug(...)
