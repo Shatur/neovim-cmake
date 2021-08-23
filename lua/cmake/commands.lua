@@ -18,7 +18,7 @@ function commands.run_command(command, ...)
   end
   local command_func = cmake[command]
   if not command_func then
-    print('No such command: ' .. command)
+    vim.notify('No such command: ' .. command, 'error', { title = 'CMake' })
     return
   end
   command_func(...)

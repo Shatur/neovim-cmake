@@ -4,7 +4,7 @@ local cmake = {}
 
 function cmake.configure(...)
   if vim.fn.filereadable('CMakeLists.txt') ~= 1 then
-    print('Unable to find CMakeLists.txt')
+    vim.notify('Unable to find CMakeLists.txt', 'error', { title = 'CMake' })
     return
   end
 
@@ -21,7 +21,7 @@ function cmake.build(...)
   local parameters = utils.get_parameters()
   local target_name = parameters['currentTarget']
   if not target_name or #target_name == 0 then
-    print('You need to select target first')
+    vim.notify('You need to select target first', 'error', { title = 'CMake' })
     return
   end
 
@@ -129,14 +129,14 @@ end
 function cmake.clear_cache()
   local cache_file = utils.get_build_dir() .. 'CMakeCache.txt'
   if vim.fn.filereadable(cache_file) ~= 1 then
-    print('Cache file ' .. cache_file .. ' does not exists')
+    vim.notify('Cache file ' .. cache_file .. ' does not exists', 'error', { title = 'CMake' })
     return
   end
 
   if vim.fn.delete(cache_file) == 0 then
-    print('Cache file ' .. cache_file .. ' was deleted successfully')
+    vim.notify('Cache file ' .. cache_file .. ' was deleted successfully', 'info', { title = 'CMake' })
   else
-    print('Unable to delete cache file ' .. cache_file)
+    vim.notify('Unable to delete cache file ' .. cache_file, 'error', { title = 'CMake' })
   end
 end
 
