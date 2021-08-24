@@ -40,7 +40,7 @@ local function select_target(opts)
   local parameters = utils.get_parameters()
   local build_dir = utils.get_build_dir(parameters)
   if vim.fn.isdirectory(build_dir) ~= 1 then
-    vim.notify('You need to configure first', 'error', { title = 'CMake' })
+    vim.notify('You need to configure first', vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
 
@@ -90,14 +90,14 @@ local function create_project()
   local project_name = vim.fn.input('Project name: ')
   if #project_name == 0 then
     vim.cmd('redraw')
-    vim.notify('Project name cannot be empty', 'error', { title = 'CMake' })
+    vim.notify('Project name cannot be empty', vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
 
   local project_location = vim.fn.input('Create in: ', vim.g.default_cmake_projects_path, 'file')
   if #project_location == 0 then
     vim.cmd('redraw')
-    vim.notify('Project path cannot be empty', 'error', { title = 'CMake' })
+    vim.notify('Project path cannot be empty', vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
   vim.fn.mkdir(project_location, 'p')
@@ -106,7 +106,7 @@ local function create_project()
 
   if #vim.fn.glob(project_path) ~= 0 then
     vim.cmd('redraw')
-    vim.notify('Path ' .. project_path .. ' is already exists', 'error', { title = 'CMake' })
+    vim.notify('Path ' .. project_path .. ' is already exists', vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
 

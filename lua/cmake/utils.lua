@@ -63,13 +63,13 @@ end
 
 function utils.get_current_executable_info(parameters, build_dir)
   if vim.fn.isdirectory(build_dir) ~= 1 then
-    vim.notify('You need to configure first', 'error', { title = 'CMake' })
+    vim.notify('You need to configure first', vim.log.levels.ERROR, { title = 'CMake' })
     return nil
   end
 
   local target_name = parameters['currentTarget']
   if not target_name then
-    vim.notify('You need to select target first', 'error', { title = 'CMake' })
+    vim.notify('You need to select target first', vim.log.levels.ERROR, { title = 'CMake' })
     return nil
   end
 
@@ -78,14 +78,14 @@ function utils.get_current_executable_info(parameters, build_dir)
     if target_name == target['name'] then
       local target_info = utils.get_target_info(reply_dir, target)
       if target_info['type'] ~= 'EXECUTABLE' then
-        vim.notify('Specified target is not executable: ' .. target_name, 'error', { title = 'CMake' })
+        vim.notify('Specified target is not executable: ' .. target_name, vim.log.levels.ERROR, { title = 'CMake' })
         return nil
       end
       return target_info
     end
   end
 
-  vim.notify('Unable to find the following target: ' .. target_name, 'error', { title = 'CMake' })
+  vim.notify('Unable to find the following target: ' .. target_name, vim.log.levels.ERROR, { title = 'CMake' })
   return nil
 end
 
@@ -98,7 +98,7 @@ function utils.get_current_target(parameters)
 
   local target = build_dir .. target_info['artifacts'][1]['path']
   if vim.fn.filereadable(target) ~= 1 then
-    vim.notify('Selected target is not built: ' .. target, 'error', { title = 'CMake' })
+    vim.notify('Selected target is not built: ' .. target, vim.log.levels.ERROR, { title = 'CMake' })
     return nil, nil
   end
 
@@ -139,7 +139,7 @@ end
 function utils.check_debugging_build_type(parameters)
   local buildType = parameters['buildType']
   if buildType ~= 'Debug' and buildType ~= 'RelWithDebInfo' then
-    vim.notify('For debugging you need to use Debug or RelWithDebInfo, but currently your build type is ' .. buildType, 'error', { title = 'CMake' })
+    vim.notify('For debugging you need to use Debug or RelWithDebInfo, but currently your build type is ' .. buildType, vim.log.levels.ERROR, { title = 'CMake' })
     return false
   end
   return true
