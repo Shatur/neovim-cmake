@@ -1,18 +1,5 @@
+local os = require('ffi').os
 local utils = {}
-
-function utils.get_os_name()
-  if vim.fn.has('mac') == 1 then
-    return 'mac'
-  elseif vim.fn.has('unix') == 1 then
-    return 'unix'
-  elseif vim.fn.has('win32') == 1 then
-    return 'win'
-  elseif vim.has('bsd') == 1 then
-    return 'bsd'
-  else
-    return 'unknown'
-  end
-end
 
 function utils.get_parameters()
   if vim.fn.filereadable(vim.g.cmake_parameters_file) ~= 1 then
@@ -32,7 +19,7 @@ function utils.get_build_dir(parameters)
 
   local build_dir = vim.g.cmake_build_dir .. '/'
   build_dir = build_dir:gsub('{cwd}', vim.fn.getcwd())
-  build_dir = build_dir:gsub('{os}', utils.get_os_name())
+  build_dir = build_dir:gsub('{os}', os)
   build_dir = build_dir:gsub('{build_type}', parameters['buildType'])
   return build_dir
 end
