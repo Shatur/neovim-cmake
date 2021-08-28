@@ -1,4 +1,4 @@
-local os = require('ffi').os
+local os = require('ffi').os:lower()
 local utils = {}
 
 function utils.get_parameters()
@@ -20,7 +20,7 @@ function utils.get_build_dir(parameters)
   local build_dir = vim.g.cmake_build_dir .. '/'
   build_dir = build_dir:gsub('{cwd}', vim.fn.getcwd())
   build_dir = build_dir:gsub('{os}', os)
-  build_dir = build_dir:gsub('{build_type}', parameters['buildType'])
+  build_dir = build_dir:gsub('{build_type}', parameters['buildType']:lower())
   return build_dir
 end
 
