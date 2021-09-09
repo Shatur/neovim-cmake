@@ -95,7 +95,7 @@ function utils.get_current_target(parameters)
 end
 
 function utils.asyncrun_callback(function_string)
-  vim.cmd('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | call luaeval("' .. function_string .. '") | endif')
+  vim.api.nvim_command('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | call luaeval("' .. function_string .. '") | endif')
 end
 
 function utils.copy_compile_commands()
@@ -119,7 +119,7 @@ end
 
 function utils.autoclose_quickfix(options)
   if vim.fn.get(options, 'mode', 'async') ~= 'async' then
-    vim.cmd('cclose')
+    vim.api.nvim_command('cclose')
   end
 end
 

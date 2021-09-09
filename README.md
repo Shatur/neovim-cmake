@@ -72,6 +72,6 @@ Here we defined a [command modifier](https://github.com/skywind3000/asyncrun.vim
 ```lua
 vim.g.asyncrun_program = vim.empty_dict()
 -- Should be done via cmd in Lua because lambda cannot be stored in a variable (https://github.com/nanotee/nvim-lua-guide#conversion-is-not-always-possible)
-vim.cmd("let g:asyncrun_program.vcvars64 = { opts -> '\"C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvars64.bat\" && ' .. opts.cmd }")
+vim.api.nvim_command("let g:asyncrun_program.vcvars64 = { opts -> '\"C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvars64.bat\" && ' .. opts.cmd }")
 vim.g.cmake_asyncrun_options = vim.tbl_extend('force', vim.g.cmake_asyncrun_options, {program = 'vcvars64'})
 ```

@@ -70,7 +70,7 @@ function cmake.debug(...)
 
   table.insert(splitted_args, { ... })
 
-  vim.cmd('cclose')
+  vim.api.nvim_command('cclose')
   local config = {
     type = 'cpp',
     name = 'Debug CMake target',

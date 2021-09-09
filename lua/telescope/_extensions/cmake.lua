@@ -89,14 +89,14 @@ end
 local function create_project()
   local project_name = vim.fn.input('Project name: ')
   if #project_name == 0 then
-    vim.cmd('redraw')
+    vim.api.nvim_command('redraw')
     vim.notify('Project name cannot be empty', vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
 
   local project_location = vim.fn.input('Create in: ', vim.g.default_cmake_projects_path, 'file')
   if #project_location == 0 then
-    vim.cmd('redraw')
+    vim.api.nvim_command('redraw')
     vim.notify('Project path cannot be empty', vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
@@ -105,7 +105,7 @@ local function create_project()
   local project_path = vim.fn.expand(project_location) .. '/' .. project_name
 
   if #vim.fn.glob(project_path) ~= 0 then
-    vim.cmd('redraw')
+    vim.api.nvim_command('redraw')
     vim.notify('Path ' .. project_path .. ' is already exists', vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
@@ -121,8 +121,8 @@ local function create_project()
       local select = function()
         actions.close(prompt_bufnr)
         utils.copy_folder(vim.g.cmake_samples_path .. actions.get_selected_entry(prompt_bufnr).display, project_path)
-        vim.cmd('edit ' .. project_path .. '/CMakeLists.txt')
-        vim.cmd('cd %:h')
+        vim.api.nvim_command('edit ' .. project_path .. '/CMakeLists.txt')
+        vim.api.nvim_command('cd %:h')
       end
 
       actions.select_default:replace(select)
