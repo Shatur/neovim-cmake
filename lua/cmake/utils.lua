@@ -1,5 +1,6 @@
 local os = require('ffi').os:lower()
 local utils = {}
+local Path = require('plenary.path')
 
 function utils.get_parameters()
   if vim.fn.filereadable(vim.g.cmake_parameters_file) ~= 1 then
@@ -89,7 +90,17 @@ function utils.get_current_target(parameters)
     return nil, nil
   end
 
-  local target_dir = vim.fn.fnamemodify(target, ':h')
+  local target_dir
+  local run_dir = parameters['runDir']
+  if run_dir == nil then
+    target_dir = vim.fn.fnamemodify(target, ':h')
+  else
+    local target_dir = Path:new(run_dir)
+    if not target_dir:is_absolute() then
+      target_dir = build_dir .. run_dir
+    end
+    target = Path:new(target):make_relative(target_dir)
+  end
   local arguments = parameters['arguments'][target_info['name']]
   return target_dir, target, arguments
 end

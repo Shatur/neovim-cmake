@@ -58,6 +58,12 @@ Also the corresponding Lua functions with the same names as the arguments are av
 | `g:cmake_asyncrun_options`        | `{'save': 2}`                           | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed on cmake execution.                                                                                                                 |
 | `g:cmake_target_asyncrun_options` | `{}`                                    | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed on target execution.                                                                                                                |
 
+The user may also specify the default path to run the targets from by defining it in the `g:cmake_parameters_file` in the base directory of the project, (i.e):
+
+```json
+{"arguments": [], "currentTarget": "target", "buildType": "Debug", "run_dir": "path/to/directory/"}
+```
+
 ## Simple usage example
 
 1. Create a new project (`:Telescope cmake create_project`) or open an existing.
