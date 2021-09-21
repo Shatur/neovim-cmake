@@ -96,7 +96,7 @@ function utils.get_current_target(parameters)
     target_dir = vim.fn.fnamemodify(target, ':h')
   else
     local target_dir = Path:new(run_dir)
-    if target_dir:is_absolute() ~= 1 then
+    if not target_dir:is_absolute() then
       target_dir = Path:new(build_dir .. run_dir):normalize(vim.loop.cwd())
     end
     target = Path:new(target):make_relative(target_dir)
