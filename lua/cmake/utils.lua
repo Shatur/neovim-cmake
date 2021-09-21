@@ -91,16 +91,15 @@ function utils.get_current_target(parameters)
   end
 
   local target_dir
-  if parameters['runDir'] ~= nil then
-    local run_path = Path:new(parameters['runDir'])
-    if run_path:is_absolute() then
-      target_dir = run_path:normalize(vim.loop.cwd())
-    else
-      target_dir = Path:new(build_dir .. parameters['runDir']):normalize(vim.loop.cwd())
+  local run_dir = parameters['runDir']
+  if run_dir == nil then
+    target_dir = vim.fn.fnamemodify(target, ':h')
+  else
+    local target_dir = Path:new(run_dir)
+    if target_dir:is_absolute() ~= 1 then
+      target_dir = Path:new(build_dir .. run_dir):normalize(vim.loop.cwd())
     end
     target = Path:new(target):make_relative(target_dir)
-  else
-    target_dir = vim.fn.fnamemodify(target, ':h')
   end
   local arguments = parameters['arguments'][target_info['name']]
   return target_dir, target, arguments
