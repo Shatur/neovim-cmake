@@ -97,7 +97,7 @@ function utils.get_current_target(parameters)
   else
     local target_dir = Path:new(run_dir)
     if not target_dir:is_absolute() then
-      target_dir = Path:new(build_dir .. run_dir):normalize(vim.loop.cwd())
+      target_dir = build_dir .. run_dir
     end
     target = Path:new(target):make_relative(target_dir)
   end
