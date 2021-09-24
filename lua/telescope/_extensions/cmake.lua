@@ -97,39 +97,37 @@ local function create_project(opts)
   -- Use dropdown theme by default
   opts = themes.get_dropdown(opts)
 
-  local project_name = vim.fn.input('Project name: ')
-  if #project_name == 0 then
-    vim.api.nvim_command('redraw')
-    vim.notify('Project name cannot be empty', vim.log.levels.ERROR, { title = 'CMake' })
-    return
-  end
-
-  local project_location = vim.fn.input('Create in: ', vim.g.default_cmake_projects_path, 'file')
-  if #project_location == 0 then
-    vim.api.nvim_command('redraw')
-    vim.notify('Project path cannot be empty', vim.log.levels.ERROR, { title = 'CMake' })
-    return
-  end
-  vim.fn.mkdir(project_location, 'p')
-
-  local project_path = vim.fn.expand(project_location) .. '/' .. project_name
-
-  if #vim.fn.glob(project_path) ~= 0 then
-    vim.api.nvim_command('redraw')
-    vim.notify('Path ' .. project_path .. ' is already exists', vim.log.levels.ERROR, { title = 'CMake' })
-    return
-  end
-
-  local samples = vim.fn.map(vim.fn.readdir(vim.g.cmake_samples_path), 'fnamemodify(v:val, ":t")')
   pickers.new(opts, {
     prompt_title = 'Select sample',
     finder = finders.new_table({
-      results = samples,
+      results = vim.fn.map(vim.fn.readdir(vim.g.cmake_samples_path), 'fnamemodify(v:val, ":t")'),
     }),
     sorter = sorters.get_fzy_sorter(),
     attach_mappings = function(prompt_bufnr)
       local select = function()
         actions.close(prompt_bufnr)
+
+        local project_name = vim.fn.input('Project name: ')
+        if #project_name == 0 then
+          vim.notify('Project name cannot be empty', vim.log.levels.ERROR, { title = 'CMake' })
+          return
+        end
+
+        local project_location = vim.fn.input('Create in: ', vim.g.default_cmake_projects_path, 'file')
+        if #project_location == 0 then
+          vim.notify('Project path cannot be empty', vim.log.levels.ERROR, { title = 'CMake' })
+          return
+        end
+        vim.fn.mkdir(project_location, 'p')
+
+        local project_path = vim.fn.expand(project_location) .. '/' .. project_name
+
+        if #vim.fn.glob(project_path) ~= 0 then
+          vim.notify('Path ' .. project_path .. ' is already exists', vim.log.levels.ERROR, { title = 'CMake' })
+          return
+        end
+
+
         utils.copy_folder(vim.g.cmake_samples_path .. actions.get_selected_entry(prompt_bufnr).display, project_path)
         vim.api.nvim_command('edit ' .. project_path .. '/CMakeLists.txt')
         vim.api.nvim_command('cd %:h')
