@@ -3,9 +3,13 @@ local actions = require('telescope.actions')
 local pickers = require('telescope.pickers')
 local finders = require('telescope.finders')
 local sorters = require('telescope.sorters')
+local themes = require('telescope.themes')
 local utils = require('cmake.utils')
 
 local function select_build_type(opts)
+  -- Use dropdown theme by default
+  opts = themes.get_dropdown(opts)
+
   local parameters = utils.get_parameters()
   local current_build_type = parameters['buildType']
   local types = {}
@@ -37,6 +41,9 @@ local function select_build_type(opts)
 end
 
 local function select_target(opts)
+  -- Use dropdown theme by default
+  opts = themes.get_dropdown(opts)
+
   local parameters = utils.get_parameters()
   local build_dir = utils.get_build_dir(parameters)
   if vim.fn.isdirectory(build_dir) ~= 1 then
@@ -86,7 +93,10 @@ local function select_target(opts)
   }):find()
 end
 
-local function create_project()
+local function create_project(opts)
+  -- Use dropdown theme by default
+  opts = themes.get_dropdown(opts)
+
   local project_name = vim.fn.input('Project name: ')
   if #project_name == 0 then
     vim.api.nvim_command('redraw')
@@ -111,7 +121,7 @@ local function create_project()
   end
 
   local samples = vim.fn.map(vim.fn.readdir(vim.g.cmake_samples_path), 'fnamemodify(v:val, ":t")')
-  pickers.new({}, {
+  pickers.new(opts, {
     prompt_title = 'Select sample',
     finder = finders.new_table({
       results = samples,
