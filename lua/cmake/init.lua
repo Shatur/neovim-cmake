@@ -25,7 +25,7 @@ function cmake.build(...)
     return
   end
 
-  local command = table.concat({ 'cmake', '--build', utils.get_build_dir(parameters), '--target', target_name, ... }, ' ')
+  local command = table.concat({ 'cmake', '--build', utils.get_build_dir(parameters), '--target', target_name, vim.g.cmake_build_arguments, ... }, ' ')
   utils.autoclose_quickfix(vim.g.cmake_asyncrun_options)
   utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', vim.g.cmake_asyncrun_options, command)
