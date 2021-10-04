@@ -11,6 +11,7 @@ let g:cmake_configure_arguments = get(g:, 'cmake_configure_arguments', '-D CMAKE
 let g:cmake_build_arguments = get(g:, 'cmake_build_arguments', '')
 let g:cmake_asyncrun_options = get(g:, 'cmake_asyncrun_options', {'save': 2})
 let g:cmake_target_asyncrun_options = get(g:, 'cmake_target_asyncrun_options', {})
+let g:cmake_dap_configuration  = get(g:, 'cmake_dap_configuration', {'type': 'cpp', 'request': 'launch'})
 
 function! s:match_commands(arg, line, pos)
   return luaeval('require("cmake.commands").match_commands("' .. a:arg .. '")')
