@@ -86,7 +86,9 @@ function cmake.debug(...)
     config = vim.tbl_extend('force', config, vim.g.cmake_dap_configuration)
   end
   dap.run(config)
-  dap.repl.open()
+  if vim.g.cmake_dap_repl_open then
+    dap.repl.open()
+  end
 end
 
 function cmake.clean(...)
