@@ -61,14 +61,19 @@ function cmake.debug(...)
   end
 
   -- Split on spaces unless "in quotes"
-  local splitted_args = vim.fn.split(arguments, [[\s\%(\%([^'"]*\(['"]\)[^'"]*\1\)*[^'"]*$\)\@=]])
+  local splitted_args
+  if arguments then
+    splitted_args = vim.fn.split(arguments, [[\s\%(\%([^'"]*\(['"]\)[^'"]*\1\)*[^'"]*$\)\@=]])
+  else
+    splitted_args = {}
+  end
 
   -- Remove quotes
   for i, arg in ipairs(splitted_args) do
     splitted_args[i] = arg:gsub('"', ''):gsub("'", '')
   end
 
-  table.insert(splitted_args, { ... })
+  vim.list_extend(splitted_args, { ... })
 
   vim.api.nvim_command('cclose')
   local config = {
