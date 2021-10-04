@@ -77,13 +77,14 @@ function cmake.debug(...)
 
   vim.api.nvim_command('cclose')
   local config = {
-    type = 'cpp',
-    name = 'Debug CMake target',
-    request = 'launch',
+    name = parameters['currentTarget'],
     program = target,
     args = splitted_args,
     cwd = target_dir,
   }
+  if vim.g.cmake_dap_configuration then
+    config = vim.tbl_extend('force', config, vim.g.cmake_dap_configuration)
+  end
   dap.run(config)
   dap.repl.open()
 end

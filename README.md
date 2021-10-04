@@ -58,6 +58,7 @@ Also the corresponding Lua functions with the same names as the arguments are av
 | `g:cmake_build_arguments`         | `''`                                    | Default arguments that will be always passed at cmake build step. Example: `vim.g.cmake_build_arguments = '-j8'`.                                                                                                              |
 | `g:cmake_asyncrun_options`        | `{'save': 2}`                           | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed on cmake execution.                                                                                                                 |
 | `g:cmake_target_asyncrun_options` | `{}`                                    | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed on target execution.                                                                                                                |
+| `g:cmake_dap_configuration`       | `{'type': 'cpp', 'request': 'launch'}`  | Default DAP configuration that works with `lldb-vscode`                                                                                                                                                                        |
 
 The user may also specify the default path to run the targets from by defining it in the `g:cmake_parameters_file` in the base directory of the project, (i.e):
 
@@ -86,4 +87,19 @@ vim.g.asyncrun_program = vim.empty_dict()
 -- Should be done via cmd in Lua because lambda cannot be stored in a variable (https://github.com/nanotee/nvim-lua-guide#conversion-is-not-always-possible)
 vim.api.nvim_command("let g:asyncrun_program.vcvars64 = { opts -> '\"C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvars64.bat\" && ' .. opts.cmd }")
 vim.g.cmake_asyncrun_options = vim.tbl_extend('force', vim.g.cmake_asyncrun_options, {program = 'vcvars64'})
+```
+
+## DAP configuration example
+
+You can customize the DAP configuration via `g:cmake_dap_configuration`, `type` key and `request` key must be assigned.
+
+Here is an example of `CodeLLDB` customization:
+
+```lua
+vim.g.cmake_dap_configuration = {
+  type = 'codelldb',
+  request = 'launch',
+  stopOnEntry = false,
+  runInTerminal = false,
+}
 ```
