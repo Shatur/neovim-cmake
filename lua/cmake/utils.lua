@@ -4,14 +4,16 @@ local config = require('cmake.config')
 local utils = {}
 
 function utils.get_parameters()
-  if vim.fn.filereadable(config.parameters_file) ~= 1 then
+  local parameters_file = Path:new(config.parameters_file)
+  if not parameters_file:is_file() then
     return { currentTarget = '', buildType = 'Debug', arguments = {} }
   end
-  return vim.fn.json_decode(vim.fn.readfile(config.parameters_file))
+  return vim.fn.json_decode(parameters_file:read())
 end
 
 function utils.set_parameters(parameters)
-  vim.fn.writefile({ vim.fn.json_encode(parameters) }, config.parameters_file)
+  local parameters_file = Path:new(config.parameters_file)
+  parameters_file:write(vim.fn.json_encode(parameters), 'w')
 end
 
 function utils.get_build_dir(parameters)
@@ -19,39 +21,46 @@ function utils.get_build_dir(parameters)
     parameters = utils.get_parameters()
   end
 
-  local build_dir = config.build_dir .. '/'
+  local build_dir = config.build_dir
   build_dir = build_dir:gsub('{cwd}', vim.fn.getcwd())
   build_dir = build_dir:gsub('{os}', os)
   build_dir = build_dir:gsub('{build_type}', parameters['buildType']:lower())
-  return build_dir
+  return Path:new(build_dir)
 end
 
 function utils.get_reply_dir(build_dir)
-  return build_dir .. '.cmake/api/v1/reply/'
+  return build_dir / '.cmake/api/v1/reply'
 end
 
 function utils.get_codemodel_targets(reply_dir)
-  local codemodel_json = vim.fn.json_decode(vim.fn.readfile(vim.fn.globpath(reply_dir, 'codemodel*')))
+  local codemodel_json = vim.fn.json_decode(vim.fn.readfile(vim.fn.globpath(tostring(reply_dir), 'codemodel*')))
   return codemodel_json['configurations'][1]['targets']
 end
 
 function utils.get_target_info(reply_dir, codemodel_target)
-  return vim.fn.json_decode(vim.fn.readfile(reply_dir .. codemodel_target['jsonFile']))
+  return vim.fn.json_decode((reply_dir / codemodel_target['jsonFile']):read())
 end
 
 -- Tell CMake to generate codemodel
 function utils.make_query_files(build_dir)
-  local query_dir = build_dir .. '.cmake/api/v1/query/'
-  vim.fn.mkdir(query_dir, 'p')
-
-  local codemodel_file = query_dir .. 'codemodel-v2'
-  if vim.fn.filereadable(codemodel_file) ~= 1 then
-    vim.fn.writefile({}, codemodel_file)
+  local query_dir = build_dir / '.cmake/api/v1/query'
+  if not query_dir:mkdir({ parents = true }) then
+    vim.notify('Unable to create folder ' .. tostring(query_dir), vim.log.levels.ERROR, { title = 'CMake' })
+    return false
   end
+
+  local codemodel_file = query_dir / 'codemodel-v2'
+  if not codemodel_file:is_file() then
+    if not codemodel_file:touch() then
+      vim.notify('Unable to create file ' .. tostring(codemodel_file), vim.log.levels.ERROR, { title = 'CMake' })
+      return false
+    end
+  end
+  return true
 end
 
 function utils.get_current_executable_info(parameters, build_dir)
-  if vim.fn.isdirectory(build_dir) ~= 1 then
+  if not build_dir:is_dir() then
     vim.notify('You need to configure first', vim.log.levels.ERROR, { title = 'CMake' })
     return nil
   end
@@ -85,22 +94,22 @@ function utils.get_current_target(parameters)
     return nil, nil
   end
 
-  local target = build_dir .. target_info['artifacts'][1]['path']
-  if vim.fn.filereadable(target) ~= 1 then
-    vim.notify('Selected target is not built: ' .. target, vim.log.levels.ERROR, { title = 'CMake' })
+  local target = build_dir / target_info['artifacts'][1]['path']
+  if not target:is_file() then
+    vim.notify('Selected target is not built: ' .. tostring(target), vim.log.levels.ERROR, { title = 'CMake' })
     return nil, nil
   end
 
   local target_dir
   local run_dir = parameters['runDir']
   if run_dir == nil then
-    target_dir = vim.fn.fnamemodify(target, ':h')
+    target_dir = target:parent()
   else
     local target_dir = Path:new(run_dir)
     if not target_dir:is_absolute() then
-      target_dir = build_dir .. run_dir
+      target_dir = build_dir / run_dir
     end
-    target = Path:new(target):make_relative(target_dir)
+    target = target:make_relative(target_dir)
   end
   local arguments = parameters['arguments'][target_info['name']]
   return target_dir, target, arguments
@@ -111,16 +120,17 @@ function utils.asyncrun_callback(function_string)
 end
 
 function utils.copy_compile_commands()
-  vim.loop.fs_copyfile(utils.get_build_dir() .. '/compile_commands.json', vim.fn.getcwd() .. '/compile_commands.json')
+  local compile_commands = utils.get_build_dir() / 'compile_commands.json'
+  compile_commands:copy({ destination = vim.fn.getcwd() .. '/compile_commands.json' })
 end
 
 function utils.copy_folder(folder, destination)
-  vim.fn.mkdir(destination, 'p')
-  for _, entry in ipairs(vim.fn.readdir(folder)) do
-    local source_entry = folder .. '/' .. entry
-    local target_entry = destination .. '/' .. entry
-    if vim.fn.isdirectory(source_entry) ~= 1 then
-      if not vim.loop.fs_copyfile(source_entry, target_entry) then
+  destination:mkdir()
+  for _, entry in ipairs(vim.fn.readdir(tostring(folder))) do
+    local source_entry = folder / entry
+    local target_entry = destination / entry
+    if source_entry:is_file() then
+      if not source_entry:copy({ destination = tostring(target_entry) }) then
         error('Unable to copy ' .. target_entry)
       end
     else
@@ -130,7 +140,8 @@ function utils.copy_folder(folder, destination)
 end
 
 function utils.autoclose_quickfix(options)
-  if vim.fn.get(options, 'mode', 'async') ~= 'async' then
+  local mode = options['mode']
+  if not mode or mode ~= 'async' then
     vim.api.nvim_command('cclose')
   end
 end

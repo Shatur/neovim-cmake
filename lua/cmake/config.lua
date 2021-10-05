@@ -6,7 +6,7 @@ local config = {
     parameters_file = 'neovim.json',
     build_dir = '{cwd}/build/{os}-{build_type}',
     samples_path = script_path:parent():parent():parent() / 'samples',
-    default_projects_path = vim.fn.expand('~/Projects'),
+    default_projects_path = '~/Projects',
     configure_arguments = '-D CMAKE_EXPORT_COMPILE_COMMANDS=1',
     build_arguments = '',
     asyncrun_options = { save = 2 },

@@ -1,6 +1,7 @@
 local dap = require('dap')
 local utils = require('cmake.utils')
 local config = require('cmake.config')
+local Path = require('plenary.path')
 local cmake = {}
 
 function cmake.setup(values)
@@ -8,16 +9,19 @@ function cmake.setup(values)
 end
 
 function cmake.configure(...)
-  if vim.fn.filereadable('CMakeLists.txt') ~= 1 then
-    vim.notify('Unable to find CMakeLists.txt', vim.log.levels.ERROR, { title = 'CMake' })
+  local cmakelists = Path:new('CMakeLists.txt')
+  if not cmakelists:is_file() then
+    vim.notify('Unable to find ' .. tostring(cmakelists), vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
 
   local parameters = utils.get_parameters()
   local build_dir = utils.get_build_dir(parameters)
-  local command = table.concat({ 'cmake', config.configure_arguments, table.concat({ ... }, ' '), '-D', 'CMAKE_BUILD_TYPE=' .. parameters['buildType'], '-B', build_dir }, ' ')
-  vim.fn.mkdir(build_dir, 'p')
-  utils.make_query_files(build_dir)
+  local command = table.concat({ 'cmake', config.configure_arguments, table.concat({ ... }, ' '), '-D', 'CMAKE_BUILD_TYPE=' .. parameters['buildType'], '-B', tostring(build_dir) }, ' ')
+  build_dir:mkdir({ parents = true })
+  if not utils.make_query_files(build_dir) then
+    return
+  end
   utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', config.asyncrun_options, command)
 end
@@ -30,14 +34,14 @@ function cmake.build(...)
     return
   end
 
-  local command = table.concat({ 'cmake', '--build', utils.get_build_dir(parameters), '--target', target_name, config.build_arguments, ... }, ' ')
+  local command = table.concat({ 'cmake', '--build', tostring(utils.get_build_dir(parameters)), '--target', target_name, config.build_arguments, ... }, ' ')
   utils.autoclose_quickfix(config.asyncrun_options)
   utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', config.asyncrun_options, command)
 end
 
 function cmake.build_all(...)
-  local command = table.concat({ 'cmake', '--build', utils.get_build_dir(), ... }, ' ')
+  local command = table.concat({ 'cmake', '--build', tostring(utils.get_build_dir()), ... }, ' ')
   utils.autoclose_quickfix(config.asyncrun_options)
   utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', config.asyncrun_options, command)
@@ -49,9 +53,9 @@ function cmake.run(...)
     return
   end
 
-  local command = table.concat({ target, arguments, ... }, ' ')
+  local command = table.concat({ tostring(target), arguments, ... }, ' ')
   utils.autoclose_quickfix(config.target_asyncrun_options)
-  vim.fn['asyncrun#run']('', vim.tbl_extend('force', { cwd = target_dir }, config.target_asyncrun_options), command)
+  vim.fn['asyncrun#run']('', vim.tbl_extend('force', { cwd = tostring(target_dir) }, config.target_asyncrun_options), command)
 end
 
 function cmake.debug(...)
@@ -83,9 +87,9 @@ function cmake.debug(...)
   vim.api.nvim_command('cclose')
   local dap_config = {
     name = parameters['currentTarget'],
-    program = target,
+    program = tostring(target),
     args = splitted_args,
-    cwd = target_dir,
+    cwd = tostring(target_dir),
   }
   dap.run(vim.tbl_extend('force', dap_config, config.dap_configuration))
   if config.dap_open_command then
@@ -94,7 +98,7 @@ function cmake.debug(...)
 end
 
 function cmake.clean(...)
-  local command = table.concat({ 'cmake', table.concat({ ... }, ' '), '--build', utils.get_build_dir(), '--target', 'clean' }, ' ')
+  local command = table.concat({ 'cmake', table.concat({ ... }, ' '), '--build', tostring(utils.get_build_dir()), '--target', 'clean' }, ' ')
   utils.autoclose_quickfix(config.asyncrun_options)
   utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', config.asyncrun_options, command)
@@ -132,27 +136,23 @@ function cmake.set_target_arguments()
   end
 
   local current_target_name = current_target['name']
-  parameters['arguments'][current_target_name] = vim.fn.input(current_target_name .. ' arguments: ', vim.fn.get(parameters['arguments'], current_target_name), 'file')
+  parameters['arguments'][current_target_name] = vim.fn.input(current_target_name .. ' arguments: ', parameters['arguments'][current_target_name] or '', 'file')
   utils.set_parameters(parameters)
 end
 
 function cmake.clear_cache()
-  local cache_file = utils.get_build_dir() .. 'CMakeCache.txt'
-  if vim.fn.filereadable(cache_file) ~= 1 then
-    vim.notify('Cache file ' .. cache_file .. ' does not exists', vim.log.levels.ERROR, { title = 'CMake' })
+  local cache_file = utils.get_build_dir() / 'CMakeCache.txt'
+  if not cache_file:is_file() then
+    vim.notify('Cache file ' .. tostring(cache_file) .. ' does not exists', vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
 
-  if vim.fn.delete(cache_file) == 0 then
-    vim.notify('Cache file ' .. cache_file .. ' was deleted successfully', 'info', { title = 'CMake' })
-  else
-    vim.notify('Unable to delete cache file ' .. cache_file, vim.log.levels.ERROR, { title = 'CMake' })
-  end
+  cache_file:rm()
 end
 
 function cmake.open_build_dir()
   local program = vim.fn.has('win32') == 1 and 'start ' or 'xdg-open '
-  vim.fn.system(program .. utils.get_build_dir())
+  vim.fn.system(program .. tostring(utils.get_build_dir()))
 end
 
 return cmake

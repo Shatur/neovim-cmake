@@ -6,6 +6,7 @@ local sorters = require('telescope.sorters')
 local themes = require('telescope.themes')
 local utils = require('cmake.utils')
 local config = require('cmake.config')
+local Path = require('plenary.path')
 
 local function select_build_type(opts)
   -- Use dropdown theme by default
@@ -47,7 +48,7 @@ local function select_target(opts)
 
   local parameters = utils.get_parameters()
   local build_dir = utils.get_build_dir(parameters)
-  if vim.fn.isdirectory(build_dir) ~= 1 then
+  if not build_dir:is_dir() then
     vim.notify('You need to configure first', vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
@@ -114,22 +115,22 @@ local function create_project(opts)
           return
         end
 
-        local project_location = vim.fn.input('Create in: ', config.default_projects_path, 'file')
+        local project_location = vim.fn.input('Create in: ', Path:new(config.default_projects_path):expand(), 'file')
         if #project_location == 0 then
           vim.notify('Project path cannot be empty', vim.log.levels.ERROR, { title = 'CMake' })
           return
         end
-        vim.fn.mkdir(project_location, 'p')
+        project_location = Path:new(project_location)
+        project_location:mkdir({parents = true})
 
-        local project_path = vim.fn.expand(project_location) .. '/' .. project_name
-
-        if #vim.fn.glob(project_path) ~= 0 then
+        local project_path = project_location / project_name
+        if project_path:exists() then
           vim.notify('Path ' .. project_path .. ' is already exists', vim.log.levels.ERROR, { title = 'CMake' })
           return
         end
 
-        utils.copy_folder(config.samples_path .. '/' .. actions.get_selected_entry(prompt_bufnr).display, project_path)
-        vim.api.nvim_command('edit ' .. project_path .. '/CMakeLists.txt')
+        utils.copy_folder(Path:new(config.samples_path) / actions.get_selected_entry(prompt_bufnr).display, project_path)
+        vim.api.nvim_command('edit ' .. tostring(project_path / 'CMakeLists.txt'))
         vim.api.nvim_command('cd %:h')
       end
 
