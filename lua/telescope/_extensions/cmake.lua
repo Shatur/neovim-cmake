@@ -5,6 +5,7 @@ local finders = require('telescope.finders')
 local sorters = require('telescope.sorters')
 local themes = require('telescope.themes')
 local utils = require('cmake.utils')
+local config = require('cmake.config')
 
 local function select_build_type(opts)
   -- Use dropdown theme by default
@@ -100,7 +101,7 @@ local function create_project(opts)
   pickers.new(opts, {
     prompt_title = 'Select sample',
     finder = finders.new_table({
-      results = vim.fn.map(vim.fn.readdir(vim.g.cmake_samples_path), 'fnamemodify(v:val, ":t")'),
+      results = vim.fn.map(vim.fn.readdir(tostring(config.samples_path)), 'fnamemodify(v:val, ":t")'),
     }),
     sorter = sorters.get_fzy_sorter(),
     attach_mappings = function(prompt_bufnr)
@@ -113,7 +114,7 @@ local function create_project(opts)
           return
         end
 
-        local project_location = vim.fn.input('Create in: ', vim.g.default_cmake_projects_path, 'file')
+        local project_location = vim.fn.input('Create in: ', config.default_projects_path, 'file')
         if #project_location == 0 then
           vim.notify('Project path cannot be empty', vim.log.levels.ERROR, { title = 'CMake' })
           return
@@ -127,8 +128,7 @@ local function create_project(opts)
           return
         end
 
-
-        utils.copy_folder(vim.g.cmake_samples_path .. actions.get_selected_entry(prompt_bufnr).display, project_path)
+        utils.copy_folder(config.samples_path .. '/' .. actions.get_selected_entry(prompt_bufnr).display, project_path)
         vim.api.nvim_command('edit ' .. project_path .. '/CMakeLists.txt')
         vim.api.nvim_command('cd %:h')
       end

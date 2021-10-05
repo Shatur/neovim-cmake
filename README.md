@@ -9,10 +9,6 @@ A Neovim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/ma
 - [AsyncRun](https://github.com/skywind3000/asyncrun.vim) to run all tasks asynchronously.
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap) for debugging.
 
-## Setup
-
-To make CMake telescope pickers available you should call `require('telescope').load_extension('cmake')`.
-
 ## Commands
 
 Use the command `:CMake` with one of the following arguments:
@@ -45,33 +41,6 @@ Use `:Telescope cmake` with one for the following arguments:
 
 Also the corresponding Lua functions with the same names as the arguments are available from [require('telescope').extensions.cmake](lua/telescope/_extensions/cmake.lua).
 
-## Parameters
-
-| Variable                          | Default value                           | Description                                                                                                                                                                                                                    |
-| --------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `g:loaded_cmake`                  | `v:true`                                | Set this value to `v:false` to disable plugin loading.                                                                                                                                                                         |
-| `g:cmake_parameters_file`         | `'neovim.json'`                         | JSON file to store information about selected target, run arguments and build type. `vim.json` (in project directory) by default.                                                                                              |
-| `g:cmake_build_dir`               | `{cwd}/build/{os}-{build_type}`         | Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values.                                                                                                       |
-| `g:cmake_samples_path`            | `expand('<sfile>:p:h:h') . '/samples/'` | Folder with samples. `samples` folder from the plugin directory is used by default.                                                                                                                                            |
-| `g:default_cmake_projects_path`   | `expand('~/Projects')`                  | Default folder for creating project.                                                                                                                                                                                           |
-| `g:cmake_configure_arguments`     | `'-D CMAKE_EXPORT_COMPILE_COMMANDS=1'`  | Default arguments that will be always passed at cmake configure step. By default tells cmake to generate `compile_commands.json`. Example: `vim.g.cmake_configure_arguments = vim.g.cmake_configure_arguments .. ' -G Ninja'`. |
-| `g:cmake_build_arguments`         | `''`                                    | Default arguments that will be always passed at cmake build step. Example: `vim.g.cmake_build_arguments = '-j8'`.                                                                                                              |
-| `g:cmake_asyncrun_options`        | `{'save': 2}`                           | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed on cmake execution.                                                                                                                 |
-| `g:cmake_target_asyncrun_options` | `{}`                                    | AsyncRun [options](https://github.com/skywind3000/asyncrun.vim#manual) that will be passed on target execution.                                                                                                                |
-| `g:cmake_dap_configuration`       | `{'type': 'cpp', 'request': 'launch'}`  | Default DAP configuration that works with `lldb-vscode`                                                                                                                                                                        |
-| `g:cmake_dap_repl_open`           | `v:true`                                | Set this value to `v:false` to stop DAP REPL from opening automatically                                                                                                                                                        |
-
-The user may also specify the default path to run the targets from by defining it in the `g:cmake_parameters_file` in the base directory of the project, (i.e):
-
-```json
-{
-  "arguments": [],
-  "currentTarget": "target",
-  "buildType": "Debug",
-  "run_dir": "path/to/directory/"
-}
-```
-
 ## Simple usage example
 
 1. Create a new project (`:Telescope cmake create_project`) or open an existing.
@@ -79,7 +48,41 @@ The user may also specify the default path to run the targets from by defining i
 3. Select target to execute (`:Telescope select_target`).
 4. Build and run (`:CMake build_and_run`)
 
-## MSVC x64 configuration example
+## Configuration
+
+To configure the plugin, you can call `require('cmake').setup(values)`, where `values` is a dictionary with the parameters you want to override. Here are the defaults:
+
+```lua
+require('cmake').setup({
+  parameters_file = 'neovim.json', -- JSON file to store information about selected target, run arguments and build type.
+  build_dir = '{cwd}/build/{os}-{build_type}', -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values.
+  samples_path = script_path:parent():parent():parent() / 'samples', -- Folder with samples. `samples` folder from the plugin directory is used by default.
+  default_projects_path = vim.fn.expand('~/Projects'), -- Default folder for creating project.
+  configure_arguments = '-D CMAKE_EXPORT_COMPILE_COMMANDS=1', -- Default arguments that will be always passed at cmake configure step. By default tells cmake to generate `compile_commands.json`.
+  build_arguments = '', -- Default arguments that will be always passed at cmake build step.
+  asyncrun_options = { save = 2 }, -- AsyncRun options that will be passed on cmake execution. See https://github.com/skywind3000/asyncrun.vim#manual
+  target_asyncrun_options = {}, -- AsyncRun options that will be passed on target execution. See https://github.com/skywind3000/asyncrun.vim#manual
+  dap_configuration = { type = 'cpp', request = 'launch' }, -- DAP configuration. By default configured to work with `lldb-vscode`.
+  dap_open_command = require('dap').repl.open, -- Command to run after starting DAP session. You can set it to nil if you don't want to open anything or `require('dapui').open` if you are using https://github.com/rcarriga/nvim-dap-ui
+})
+```
+
+The mentioned `parameters_file` will be created for every project with the following content:
+
+```jsonc
+{
+  "arguments": {}, // A dictionary with target names and their arguments specified as an array.
+  "currentTarget": "", // Current target name.
+  "buildType": "", // Current build type, can be Debug, Release, RelWithDebInfo or MinSizeRel.
+  "run_dir": "" // Default working directory for targets. By default is missing, the current target directory will be used
+}
+```
+
+Usually you don't need to edit it manually, you can set its values using the `:Telescope cmake <command>` commands.
+
+To make CMake telescope pickers available you should call `require('telescope').load_extension('cmake')`.
+
+### MSVC x64 configuration example
 
 Here we defined a [command modifier](https://github.com/skywind3000/asyncrun.vim#command-modifier) and specified it in `g:cmake_asyncrun_options`:
 
@@ -87,20 +90,18 @@ Here we defined a [command modifier](https://github.com/skywind3000/asyncrun.vim
 vim.g.asyncrun_program = vim.empty_dict()
 -- Should be done via cmd in Lua because lambda cannot be stored in a variable (https://github.com/nanotee/nvim-lua-guide#conversion-is-not-always-possible)
 vim.api.nvim_command("let g:asyncrun_program.vcvars64 = { opts -> '\"C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvars64.bat\" && ' .. opts.cmd }")
-vim.g.cmake_asyncrun_options = vim.tbl_extend('force', vim.g.cmake_asyncrun_options, {program = 'vcvars64'})
+require('cmake').setup({
+    asyncrun_options = { save = 2, program = 'vcvars64' },
+})
 ```
 
-## DAP configuration example
-
-You can customize the DAP configuration via `g:cmake_dap_configuration`, `type` key and `request` key must be assigned.
-
-Here is an example of `CodeLLDB` customization:
+### CodeLLDB DAP configuration example
 
 ```lua
-vim.g.cmake_dap_configuration = {
+require('cmake').setup({
   type = 'codelldb',
   request = 'launch',
   stopOnEntry = false,
   runInTerminal = false,
-}
+})
 ```

@@ -4,7 +4,7 @@ local commands = {}
 function commands.match_commands(arg)
   local matches = {}
   for command in pairs(cmake) do
-    if vim.startswith(command, arg) then
+    if vim.startswith(command, arg) and command ~= 'setup' then
       table.insert(matches, command)
     end
   end

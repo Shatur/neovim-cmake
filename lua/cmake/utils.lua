@@ -1,16 +1,17 @@
 local os = require('ffi').os:lower()
-local utils = {}
 local Path = require('plenary.path')
+local config = require('cmake.config')
+local utils = {}
 
 function utils.get_parameters()
-  if vim.fn.filereadable(vim.g.cmake_parameters_file) ~= 1 then
+  if vim.fn.filereadable(config.parameters_file) ~= 1 then
     return { currentTarget = '', buildType = 'Debug', arguments = {} }
   end
-  return vim.fn.json_decode(vim.fn.readfile(vim.g.cmake_parameters_file))
+  return vim.fn.json_decode(vim.fn.readfile(config.parameters_file))
 end
 
 function utils.set_parameters(parameters)
-  vim.fn.writefile({ vim.fn.json_encode(parameters) }, vim.g.cmake_parameters_file)
+  vim.fn.writefile({ vim.fn.json_encode(parameters) }, config.parameters_file)
 end
 
 function utils.get_build_dir(parameters)
@@ -18,7 +19,7 @@ function utils.get_build_dir(parameters)
     parameters = utils.get_parameters()
   end
 
-  local build_dir = vim.g.cmake_build_dir .. '/'
+  local build_dir = config.build_dir .. '/'
   build_dir = build_dir:gsub('{cwd}', vim.fn.getcwd())
   build_dir = build_dir:gsub('{os}', os)
   build_dir = build_dir:gsub('{build_type}', parameters['buildType']:lower())
