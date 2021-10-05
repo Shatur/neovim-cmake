@@ -6,6 +6,7 @@ local sorters = require('telescope.sorters')
 local themes = require('telescope.themes')
 local utils = require('cmake.utils')
 local config = require('cmake.config')
+local scandir = require('plenary.scandir')
 local Path = require('plenary.path')
 
 local function select_build_type(opts)
@@ -102,7 +103,7 @@ local function create_project(opts)
   pickers.new(opts, {
     prompt_title = 'Select sample',
     finder = finders.new_table({
-      results = vim.fn.map(vim.fn.readdir(tostring(config.samples_path)), 'fnamemodify(v:val, ":t")'),
+      results = vim.fn.map(scandir.scan_dir(tostring(config.samples_path), { depth = 1, only_dirs = true }), 'fnamemodify(v:val, ":t")'),
     }),
     sorter = sorters.get_fzy_sorter(),
     attach_mappings = function(prompt_bufnr)
@@ -121,7 +122,7 @@ local function create_project(opts)
           return
         end
         project_location = Path:new(project_location)
-        project_location:mkdir({parents = true})
+        project_location:mkdir({ parents = true })
 
         local project_path = project_location / project_name
         if project_path:exists() then

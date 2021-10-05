@@ -1,6 +1,7 @@
 local os = require('ffi').os:lower()
 local Path = require('plenary.path')
 local config = require('cmake.config')
+local scandir = require('plenary.scandir')
 local utils = {}
 
 function utils.get_parameters()
@@ -33,7 +34,8 @@ function utils.get_reply_dir(build_dir)
 end
 
 function utils.get_codemodel_targets(reply_dir)
-  local codemodel_json = vim.fn.json_decode(vim.fn.readfile(vim.fn.globpath(tostring(reply_dir), 'codemodel*')))
+  local codemodel = Path:new(vim.fn.globpath(tostring(reply_dir), 'codemodel*'))
+  local codemodel_json = vim.fn.json_decode(codemodel:read())
   return codemodel_json['configurations'][1]['targets']
 end
 
@@ -126,15 +128,15 @@ end
 
 function utils.copy_folder(folder, destination)
   destination:mkdir()
-  for _, entry in ipairs(vim.fn.readdir(tostring(folder))) do
-    local source_entry = folder / entry
-    local target_entry = destination / entry
+  for _, entry in ipairs(scandir.scan_dir(folder.filename, { depth = 1, add_dirs = true })) do
+    local target_entry = destination / Path:new(entry):make_relative(folder.filename)
+    local source_entry = Path:new(entry)
     if source_entry:is_file() then
-      if not source_entry:copy({ destination = tostring(target_entry) }) then
+      if not source_entry:copy({ destination = target_entry.filename }) then
         error('Unable to copy ' .. target_entry)
       end
     else
-      utils.copy_folder(source_entry, target_entry)
+      utils.copy_folder(folder, target_entry)
     end
   end
 end
