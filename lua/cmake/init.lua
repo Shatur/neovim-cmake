@@ -11,13 +11,13 @@ end
 function cmake.configure(...)
   local cmakelists = Path:new('CMakeLists.txt')
   if not cmakelists:is_file() then
-    vim.notify('Unable to find ' .. tostring(cmakelists), vim.log.levels.ERROR, { title = 'CMake' })
+    vim.notify('Unable to find ' .. cmakelists.filename, vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
 
   local parameters = utils.get_parameters()
   local build_dir = utils.get_build_dir(parameters)
-  local command = table.concat({ 'cmake', config.configure_arguments, table.concat({ ... }, ' '), '-D', 'CMAKE_BUILD_TYPE=' .. parameters['buildType'], '-B', tostring(build_dir) }, ' ')
+  local command = table.concat({ 'cmake', config.configure_arguments, table.concat({ ... }, ' '), '-D', 'CMAKE_BUILD_TYPE=' .. parameters['buildType'], '-B', build_dir.filename }, ' ')
   build_dir:mkdir({ parents = true })
   if not utils.make_query_files(build_dir) then
     return
@@ -34,14 +34,14 @@ function cmake.build(...)
     return
   end
 
-  local command = table.concat({ 'cmake', '--build', tostring(utils.get_build_dir(parameters)), '--target', target_name, config.build_arguments, ... }, ' ')
+  local command = table.concat({ 'cmake', '--build', utils.get_build_dir(parameters).filename, '--target', target_name, config.build_arguments, ... }, ' ')
   utils.autoclose_quickfix(config.asyncrun_options)
   utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', config.asyncrun_options, command)
 end
 
 function cmake.build_all(...)
-  local command = table.concat({ 'cmake', '--build', tostring(utils.get_build_dir()), ... }, ' ')
+  local command = table.concat({ 'cmake', '--build', utils.get_build_dir().filename, ... }, ' ')
   utils.autoclose_quickfix(config.asyncrun_options)
   utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', config.asyncrun_options, command)
@@ -53,9 +53,9 @@ function cmake.run(...)
     return
   end
 
-  local command = table.concat({ tostring(target), arguments, ... }, ' ')
+  local command = table.concat({ target.filename, arguments, ... }, ' ')
   utils.autoclose_quickfix(config.target_asyncrun_options)
-  vim.fn['asyncrun#run']('', vim.tbl_extend('force', { cwd = tostring(target_dir) }, config.target_asyncrun_options), command)
+  vim.fn['asyncrun#run']('', vim.tbl_extend('force', { cwd = target_dir.filename }, config.target_asyncrun_options), command)
 end
 
 function cmake.debug(...)
@@ -87,9 +87,9 @@ function cmake.debug(...)
   vim.api.nvim_command('cclose')
   local dap_config = {
     name = parameters['currentTarget'],
-    program = tostring(target),
+    program = target.filename,
     args = splitted_args,
-    cwd = tostring(target_dir),
+    cwd = target_dir.filename,
   }
   dap.run(vim.tbl_extend('force', dap_config, config.dap_configuration))
   if config.dap_open_command then
@@ -98,7 +98,7 @@ function cmake.debug(...)
 end
 
 function cmake.clean(...)
-  local command = table.concat({ 'cmake', table.concat({ ... }, ' '), '--build', tostring(utils.get_build_dir()), '--target', 'clean' }, ' ')
+  local command = table.concat({ 'cmake', table.concat({ ... }, ' '), '--build', utils.get_build_dir().filename, '--target', 'clean' }, ' ')
   utils.autoclose_quickfix(config.asyncrun_options)
   utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
   vim.fn['asyncrun#run']('', config.asyncrun_options, command)
@@ -143,7 +143,7 @@ end
 function cmake.clear_cache()
   local cache_file = utils.get_build_dir() / 'CMakeCache.txt'
   if not cache_file:is_file() then
-    vim.notify('Cache file ' .. tostring(cache_file) .. ' does not exists', vim.log.levels.ERROR, { title = 'CMake' })
+    vim.notify('Cache file ' .. cache_file.filename .. ' does not exists', vim.log.levels.ERROR, { title = 'CMake' })
     return
   end
 
@@ -152,7 +152,7 @@ end
 
 function cmake.open_build_dir()
   local program = vim.fn.has('win32') == 1 and 'start ' or 'xdg-open '
-  vim.fn.system(program .. tostring(utils.get_build_dir()))
+  vim.fn.system(program .. utils.get_build_dir().filename)
 end
 
 return cmake

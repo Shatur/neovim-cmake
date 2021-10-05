@@ -34,7 +34,7 @@ function utils.get_reply_dir(build_dir)
 end
 
 function utils.get_codemodel_targets(reply_dir)
-  local codemodel = Path:new(vim.fn.globpath(tostring(reply_dir), 'codemodel*'))
+  local codemodel = Path:new(vim.fn.globpath(reply_dir.filename, 'codemodel*'))
   local codemodel_json = vim.fn.json_decode(codemodel:read())
   return codemodel_json['configurations'][1]['targets']
 end
@@ -47,14 +47,14 @@ end
 function utils.make_query_files(build_dir)
   local query_dir = build_dir / '.cmake/api/v1/query'
   if not query_dir:mkdir({ parents = true }) then
-    vim.notify('Unable to create folder ' .. tostring(query_dir), vim.log.levels.ERROR, { title = 'CMake' })
+    vim.notify('Unable to create folder ' .. query_dir.filename, vim.log.levels.ERROR, { title = 'CMake' })
     return false
   end
 
   local codemodel_file = query_dir / 'codemodel-v2'
   if not codemodel_file:is_file() then
     if not codemodel_file:touch() then
-      vim.notify('Unable to create file ' .. tostring(codemodel_file), vim.log.levels.ERROR, { title = 'CMake' })
+      vim.notify('Unable to create file ' .. codemodel_file.filename, vim.log.levels.ERROR, { title = 'CMake' })
       return false
     end
   end
@@ -98,7 +98,7 @@ function utils.get_current_target(parameters)
 
   local target = build_dir / target_info['artifacts'][1]['path']
   if not target:is_file() then
-    vim.notify('Selected target is not built: ' .. tostring(target), vim.log.levels.ERROR, { title = 'CMake' })
+    vim.notify('Selected target is not built: ' .. target.filename, vim.log.levels.ERROR, { title = 'CMake' })
     return nil, nil
   end
 
