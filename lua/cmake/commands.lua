@@ -1,4 +1,5 @@
 local cmake = require('cmake')
+local utils = require('cmake.utils')
 local commands = {}
 
 function commands.match_commands(arg)
@@ -18,7 +19,7 @@ function commands.run_command(command, ...)
   end
   local command_func = cmake[command]
   if not command_func then
-    vim.notify('No such command: ' .. command, vim.log.levels.ERROR, { title = 'CMake' })
+    utils.notify('No such command: ' .. command, vim.log.levels.ERROR)
     return
   end
   command_func(...)

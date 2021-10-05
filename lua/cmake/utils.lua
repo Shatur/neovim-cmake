@@ -4,6 +4,10 @@ local config = require('cmake.config')
 local scandir = require('plenary.scandir')
 local utils = {}
 
+function utils.notify(msg, log_level)
+  vim.notify(msg, log_level, { title = 'CMake' })
+end
+
 function utils.get_parameters()
   local parameters_file = Path:new(config.parameters_file)
   if not parameters_file:is_file() then
@@ -47,14 +51,14 @@ end
 function utils.make_query_files(build_dir)
   local query_dir = build_dir / '.cmake/api/v1/query'
   if not query_dir:mkdir({ parents = true }) then
-    vim.notify('Unable to create folder ' .. query_dir.filename, vim.log.levels.ERROR, { title = 'CMake' })
+    utils.notify('Unable to create folder ' .. query_dir.filename, vim.log.levels.ERROR)
     return false
   end
 
   local codemodel_file = query_dir / 'codemodel-v2'
   if not codemodel_file:is_file() then
     if not codemodel_file:touch() then
-      vim.notify('Unable to create file ' .. codemodel_file.filename, vim.log.levels.ERROR, { title = 'CMake' })
+      utils.notify('Unable to create file ' .. codemodel_file.filename, vim.log.levels.ERROR)
       return false
     end
   end
@@ -63,13 +67,13 @@ end
 
 function utils.get_current_executable_info(parameters, build_dir)
   if not build_dir:is_dir() then
-    vim.notify('You need to configure first', vim.log.levels.ERROR, { title = 'CMake' })
+    utils.notify('You need to configure first', vim.log.levels.ERROR)
     return nil
   end
 
   local target_name = parameters['currentTarget']
   if not target_name then
-    vim.notify('You need to select target first', vim.log.levels.ERROR, { title = 'CMake' })
+    utils.notify('You need to select target first', vim.log.levels.ERROR)
     return nil
   end
 
@@ -78,14 +82,14 @@ function utils.get_current_executable_info(parameters, build_dir)
     if target_name == target['name'] then
       local target_info = utils.get_target_info(reply_dir, target)
       if target_info['type'] ~= 'EXECUTABLE' then
-        vim.notify('Specified target is not executable: ' .. target_name, vim.log.levels.ERROR, { title = 'CMake' })
+        utils.notify('Specified target is not executable: ' .. target_name, vim.log.levels.ERROR)
         return nil
       end
       return target_info
     end
   end
 
-  vim.notify('Unable to find the following target: ' .. target_name, vim.log.levels.ERROR, { title = 'CMake' })
+  utils.notify('Unable to find the following target: ' .. target_name, vim.log.levels.ERROR)
   return nil
 end
 
@@ -98,7 +102,7 @@ function utils.get_current_target(parameters)
 
   local target = build_dir / target_info['artifacts'][1]['path']
   if not target:is_file() then
-    vim.notify('Selected target is not built: ' .. target.filename, vim.log.levels.ERROR, { title = 'CMake' })
+    utils.notify('Selected target is not built: ' .. target.filename, vim.log.levels.ERROR)
     return nil, nil
   end
 
@@ -151,7 +155,7 @@ end
 function utils.check_debugging_build_type(parameters)
   local buildType = parameters['buildType']
   if buildType ~= 'Debug' and buildType ~= 'RelWithDebInfo' then
-    vim.notify('For debugging you need to use Debug or RelWithDebInfo, but currently your build type is ' .. buildType, vim.log.levels.ERROR, { title = 'CMake' })
+    utils.notify('For debugging you need to use Debug or RelWithDebInfo, but currently your build type is ' .. buildType, vim.log.levels.ERROR)
     return false
   end
   return true

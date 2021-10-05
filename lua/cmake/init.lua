@@ -11,7 +11,7 @@ end
 function cmake.configure(...)
   local cmakelists = Path:new('CMakeLists.txt')
   if not cmakelists:is_file() then
-    vim.notify('Unable to find ' .. cmakelists.filename, vim.log.levels.ERROR, { title = 'CMake' })
+    utils.notify('Unable to find ' .. cmakelists.filename, vim.log.levels.ERROR)
     return
   end
 
@@ -30,7 +30,7 @@ function cmake.build(...)
   local parameters = utils.get_parameters()
   local target_name = parameters['currentTarget']
   if not target_name or #target_name == 0 then
-    vim.notify('You need to select target first', vim.log.levels.ERROR, { title = 'CMake' })
+    utils.notify('You need to select target first', vim.log.levels.ERROR)
     return
   end
 
@@ -143,7 +143,7 @@ end
 function cmake.clear_cache()
   local cache_file = utils.get_build_dir() / 'CMakeCache.txt'
   if not cache_file:is_file() then
-    vim.notify('Cache file ' .. cache_file.filename .. ' does not exists', vim.log.levels.ERROR, { title = 'CMake' })
+    utils.notify('Cache file ' .. cache_file.filename .. ' does not exists', vim.log.levels.ERROR)
     return
   end
 
