@@ -131,7 +131,7 @@ local function create_project(opts)
         end
 
         utils.copy_folder(Path:new(config.samples_path) / actions.get_selected_entry(prompt_bufnr).display, project_path)
-        vim.api.nvim_command('edit ' .. tostring(project_path / 'CMakeLists.txt'))
+        vim.api.nvim_command('edit ' .. project_path:joinpath('CMakeLists.txt').filename)
         vim.api.nvim_command('cd %:h')
       end
 
