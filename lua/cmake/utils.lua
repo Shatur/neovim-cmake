@@ -133,7 +133,7 @@ end
 function utils.copy_folder(folder, destination)
   destination:mkdir()
   for _, entry in ipairs(scandir.scan_dir(folder.filename, { depth = 1, add_dirs = true })) do
-    local target_entry = destination / Path:new(entry):make_relative(folder.filename)
+    local target_entry = destination / entry:sub(#folder.filename + 2)
     local source_entry = Path:new(entry)
     if source_entry:is_file() then
       if not source_entry:copy({ destination = target_entry.filename }) then
