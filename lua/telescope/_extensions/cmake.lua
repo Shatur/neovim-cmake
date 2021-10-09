@@ -1,5 +1,6 @@
 local telescope = require('telescope')
 local actions = require('telescope.actions')
+local state = require('telescope.actions.state')
 local pickers = require('telescope.pickers')
 local finders = require('telescope.finders')
 local sorters = require('telescope.sorters')
@@ -33,7 +34,7 @@ local function select_build_type(opts)
     attach_mappings = function(prompt_bufnr)
       local select = function()
         actions.close(prompt_bufnr)
-        parameters['buildType'] = actions.get_selected_entry(prompt_bufnr).display
+        parameters['buildType'] = state.get_selected_entry().display
         utils.set_parameters(parameters)
       end
 
@@ -86,7 +87,7 @@ local function select_target(opts)
     attach_mappings = function(prompt_bufnr)
       local select = function()
         actions.close(prompt_bufnr)
-        parameters['currentTarget'] = actions.get_selected_entry(prompt_bufnr).value
+        parameters['currentTarget'] = state.get_selected_entry().value
         utils.set_parameters(parameters)
       end
 
@@ -130,7 +131,7 @@ local function create_project(opts)
           return
         end
 
-        utils.copy_folder(Path:new(config.samples_path) / actions.get_selected_entry(prompt_bufnr).display, project_path)
+        utils.copy_folder(Path:new(config.samples_path) / state.get_selected_entry().display, project_path)
         vim.api.nvim_command('edit ' .. project_path:joinpath('CMakeLists.txt').filename)
         vim.api.nvim_command('cd %:h')
       end
