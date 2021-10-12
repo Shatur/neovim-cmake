@@ -106,16 +106,9 @@ function utils.get_current_target(parameters)
     return nil, nil
   end
 
-  local target_dir
-  local run_dir = parameters['runDir']
-  if run_dir == nil then
+  local target_dir = parameters['runDir']
+  if target_dir == nil then
     target_dir = target:parent()
-  else
-    local target_dir = Path:new(run_dir)
-    if not target_dir:is_absolute() then
-      target_dir = build_dir / run_dir
-    end
-    target = target:make_relative(target_dir)
   end
   local arguments = parameters['arguments'][target_info['name']]
   return target_dir, target, arguments
