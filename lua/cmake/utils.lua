@@ -127,7 +127,9 @@ end
 
 function utils.copy_compile_commands()
   local compile_commands = utils.get_build_dir() / 'compile_commands.json'
-  compile_commands:copy({ destination = vim.fn.getcwd() .. '/compile_commands.json' })
+  local destination = Path:new(vim.fn.getcwd(), 'compile_commands.json')
+  destination:rm()
+  compile_commands:copy({ destination = destination.filename })
 end
 
 function utils.copy_folder(folder, destination)
