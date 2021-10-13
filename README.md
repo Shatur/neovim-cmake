@@ -53,11 +53,12 @@ Also the corresponding Lua functions with the same names as the arguments are av
 To configure the plugin, you can call `require('cmake').setup(values)`, where `values` is a dictionary with the parameters you want to override. Here are the defaults:
 
 ```lua
+local Path = require('plenary.path')
 require('cmake').setup({
   parameters_file = 'neovim.json', -- JSON file to store information about selected target, run arguments and build type.
-  build_dir = '{cwd}/build/{os}-{build_type}', -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values.
+  build_dir = Path:new('{cwd}', 'build', '{os}-{build_type}'), -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values.
   samples_path = script_path:parent():parent():parent() / 'samples', -- Folder with samples. `samples` folder from the plugin directory is used by default.
-  default_projects_path = '~/Projects', -- Default folder for creating project.
+  default_projects_path = Path:new(vim.loop.os_homedir(), 'Projects'), -- Default folder for creating project.
   configure_arguments = '-D CMAKE_EXPORT_COMPILE_COMMANDS=1', -- Default arguments that will be always passed at cmake configure step. By default tells cmake to generate `compile_commands.json`.
   build_arguments = '', -- Default arguments that will be always passed at cmake build step.
   asyncrun_options = { save = 2 }, -- AsyncRun options that will be passed on cmake execution. See https://github.com/skywind3000/asyncrun.vim#manual

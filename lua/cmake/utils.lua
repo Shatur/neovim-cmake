@@ -26,7 +26,7 @@ function utils.get_build_dir(parameters)
     parameters = utils.get_parameters()
   end
 
-  local build_dir = config.build_dir
+  local build_dir = tostring(config.build_dir)
   build_dir = build_dir:gsub('{cwd}', vim.fn.getcwd())
   build_dir = build_dir:gsub('{os}', os)
   build_dir = build_dir:gsub('{build_type}', parameters['buildType']:lower())
@@ -34,7 +34,7 @@ function utils.get_build_dir(parameters)
 end
 
 function utils.get_reply_dir(build_dir)
-  return build_dir / '.cmake/api/v1/reply'
+  return build_dir / '.cmake' / 'api' / 'v1' / 'reply'
 end
 
 function utils.get_codemodel_targets(reply_dir)
@@ -49,7 +49,7 @@ end
 
 -- Tell CMake to generate codemodel
 function utils.make_query_files(build_dir)
-  local query_dir = build_dir / '.cmake/api/v1/query'
+  local query_dir = build_dir / '.cmake' / 'api' / 'v1' / 'query'
   if not query_dir:mkdir({ parents = true }) then
     utils.notify('Unable to create folder ' .. query_dir.filename, vim.log.levels.ERROR)
     return false

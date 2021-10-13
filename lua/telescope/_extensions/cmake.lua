@@ -117,7 +117,7 @@ local function create_project(opts)
           return
         end
 
-        local project_location = vim.fn.input('Create in: ', Path:new(config.default_projects_path):expand(), 'file')
+        local project_location = vim.fn.input('Create in: ', tostring(config.default_projects_path), 'file')
         if #project_location == 0 then
           utils.notify('Project path cannot be empty', vim.log.levels.ERROR)
           return
