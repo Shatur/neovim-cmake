@@ -4,9 +4,9 @@ local script_path = Path:new(debug.getinfo(1).source:sub(2))
 local config = {
   defaults = {
     parameters_file = 'neovim.json',
-    build_dir = '{cwd}/build/{os}-{build_type}',
+    build_dir = Path:new('{cwd}', 'build', '{os}-{build_type}'),
     samples_path = script_path:parent():parent():parent() / 'samples',
-    default_projects_path = '~/Projects',
+    default_projects_path = Path:new(vim.loop.os_homedir(), 'Projects'),
     configure_arguments = '-D CMAKE_EXPORT_COMPILE_COMMANDS=1',
     build_arguments = '',
     asyncrun_options = { save = 2 },
