@@ -140,13 +140,6 @@ function utils.copy_folder(folder, destination)
   end
 end
 
-function utils.autoclose_quickfix(options)
-  local mode = options['mode']
-  if not mode or mode ~= 'async' then
-    vim.api.nvim_command('cclose')
-  end
-end
-
 function utils.check_debugging_build_type(parameters)
   local buildType = parameters['buildType']
   if buildType ~= 'Debug' and buildType ~= 'RelWithDebInfo' then
