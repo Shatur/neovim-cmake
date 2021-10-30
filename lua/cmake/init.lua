@@ -17,13 +17,14 @@ function cmake.configure(...)
 
   local parameters = utils.get_parameters()
   local build_dir = utils.get_build_dir(parameters)
-  local command = table.concat({ 'cmake', config.configure_arguments, table.concat({ ... }, ' '), '-D', 'CMAKE_BUILD_TYPE=' .. parameters['buildType'], '-B', build_dir.filename }, ' ')
   build_dir:mkdir({ parents = true })
   if not utils.make_query_files(build_dir) then
     return
   end
-  utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
-  vim.fn['asyncrun#run']('', config.asyncrun_options, command)
+
+  local args = { '-B', build_dir.filename, '-D', 'CMAKE_BUILD_TYPE=' .. parameters['buildType'], unpack(config.configure_args) }
+  vim.list_extend(args, { ... })
+  return utils.run('cmake', args, { on_success = utils.copy_compile_commands() })
 end
 
 function cmake.build(...)
@@ -34,25 +35,23 @@ function cmake.build(...)
     return
   end
 
-  local command = table.concat({ 'cmake', '--build', utils.get_build_dir(parameters).filename, '--target', target_name, config.build_arguments, ... }, ' ')
-  utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
-  vim.fn['asyncrun#run']('', config.asyncrun_options, command)
+  local args = { '--build', utils.get_build_dir(parameters).filename, '--target', target_name, unpack(config.build_args) }
+  vim.list_extend(args, { ... })
+  return utils.run('cmake', args, { on_success = utils.copy_compile_commands() })
 end
 
 function cmake.build_all(...)
-  local command = table.concat({ 'cmake', '--build', utils.get_build_dir().filename, ... }, ' ')
-  utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
-  vim.fn['asyncrun#run']('', config.asyncrun_options, command)
+  return utils.run('cmake', { '--build', utils.get_build_dir().filename, ... }, { on_success = utils.copy_compile_commands() })
 end
 
 function cmake.run(...)
-  local target_dir, target, arguments = utils.get_current_target(utils.get_parameters())
+  local target_dir, target, args = utils.get_current_target(utils.get_parameters())
   if not target then
     return
   end
 
-  local command = table.concat({ target.filename, arguments, ... }, ' ')
-  vim.fn['asyncrun#run']('', vim.tbl_extend('force', { cwd = target_dir.filename }, config.target_asyncrun_options), command)
+  vim.list_extend(args, { ... })
+  return utils.run(target.filename, args, { cwd = target_dir.filename })
 end
 
 function cmake.debug(...)
@@ -61,31 +60,18 @@ function cmake.debug(...)
     return
   end
 
-  local target_dir, target, arguments = utils.get_current_target(parameters)
+  local target_dir, target, args = utils.get_current_target(parameters)
   if not target then
     return
   end
 
-  -- Split on spaces unless "in quotes"
-  local splitted_args
-  if arguments then
-    splitted_args = vim.fn.split(arguments, [[\s\%(\%([^'"]*\(['"]\)[^'"]*\1\)*[^'"]*$\)\@=]])
-  else
-    splitted_args = {}
-  end
-
-  -- Remove quotes
-  for i, arg in ipairs(splitted_args) do
-    splitted_args[i] = arg:gsub('"', ''):gsub("'", '')
-  end
-
-  vim.list_extend(splitted_args, { ... })
+  vim.list_extend(args, { ... })
 
   vim.api.nvim_command('cclose')
   local dap_config = {
     name = parameters['currentTarget'],
     program = target.filename,
-    args = splitted_args,
+    args = args,
     cwd = target_dir.filename,
   }
   dap.run(vim.tbl_extend('force', dap_config, config.dap_configuration))
@@ -95,9 +81,9 @@ function cmake.debug(...)
 end
 
 function cmake.clean(...)
-  local command = table.concat({ 'cmake', table.concat({ ... }, ' '), '--build', utils.get_build_dir().filename, '--target', 'clean' }, ' ')
-  utils.asyncrun_callback("require('cmake.utils').copy_compile_commands()")
-  vim.fn['asyncrun#run']('', config.asyncrun_options, command)
+  local args = { '--build', utils.get_build_dir().filename, '--target', 'clean' }
+  vim.list_extend(args, { ... })
+  return utils.run('cmake', args, { on_success = utils.copy_compile_commands() })
 end
 
 function cmake.build_and_run(...)
@@ -106,8 +92,9 @@ function cmake.build_and_run(...)
     return
   end
 
-  utils.asyncrun_callback("require('cmake').run()")
-  cmake.build(...)
+  return cmake.build(...):after(function()
+    vim.schedule(cmake.run)
+  end)
 end
 
 function cmake.build_and_debug(...)
@@ -120,11 +107,12 @@ function cmake.build_and_debug(...)
     return
   end
 
-  utils.asyncrun_callback("require('cmake').debug()")
-  cmake.build(...)
+  return cmake.build(...):after_success(function()
+    vim.schedule(cmake.debug)
+  end)
 end
 
-function cmake.set_target_arguments()
+function cmake.set_target_args()
   local parameters = utils.get_parameters()
   local current_target = utils.get_current_executable_info(parameters, utils.get_build_dir(parameters))
   if not current_target then
@@ -132,7 +120,7 @@ function cmake.set_target_arguments()
   end
 
   local current_target_name = current_target['name']
-  parameters['arguments'][current_target_name] = vim.fn.input(current_target_name .. ' arguments: ', parameters['arguments'][current_target_name] or '', 'file')
+  parameters['args'][current_target_name] = vim.fn.input(current_target_name .. ' arguments: ', parameters['arguments'][current_target_name] or '', 'file')
   utils.set_parameters(parameters)
 end
 
@@ -149,6 +137,24 @@ end
 function cmake.open_build_dir()
   local program = vim.fn.has('win32') == 1 and 'start ' or 'xdg-open '
   vim.fn.system(program .. utils.get_build_dir().filename)
+end
+
+function cmake.cancel()
+  if not utils.last_job or utils.last_job.is_shutdown then
+    utils.notify('No running process')
+    return
+  end
+
+  utils.last_job:shutdown(1, 9)
+
+  if vim.fn.has('win32') == 1 then
+    -- Kill all children
+    for _, pid in ipairs(vim.api.nvim_get_proc_children(utils.last_job.pid)) do
+      vim.loop.kill(pid, 9)
+    end
+  else
+    vim.loop.kill(utils.last_job.pid, 9)
+  end
 end
 
 return cmake

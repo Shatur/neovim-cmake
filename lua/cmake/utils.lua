@@ -1,8 +1,33 @@
 local os = require('ffi').os:lower()
+local Job = require('plenary.job')
 local Path = require('plenary.path')
 local config = require('cmake.config')
 local scandir = require('plenary.scandir')
-local utils = {}
+local utils = { last_job = nil }
+
+local function print_output(error, data)
+    vim.schedule(function()
+      vim.fn.setqflist({}, 'a', { lines = { error and error or data } })
+      if vim.bo.buftype ~= 'quickfix' then
+        vim.api.nvim_command('cbottom')
+      end
+    end)
+end
+
+local function split_args(args)
+  if not args then
+    return {}
+  end
+
+  -- Split on spaces unless "in quotes"
+  local splitted_args = vim.fn.split(args, [[\s\%(\%([^'"]*\(['"]\)[^'"]*\1\)*[^'"]*$\)\@=]])
+
+  -- Remove quotes
+  for i, arg in ipairs(splitted_args) do
+    splitted_args[i] = arg:gsub('"', ''):gsub("'", '')
+  end
+  return splitted_args
+end
 
 function utils.notify(msg, log_level)
   vim.notify(msg, log_level, { title = 'CMake' })
@@ -11,7 +36,7 @@ end
 function utils.get_parameters()
   local parameters_file = Path:new(config.parameters_file)
   if not parameters_file:is_file() then
-    return { currentTarget = '', buildType = 'Debug', arguments = {} }
+    return { currentTarget = '', buildType = 'Debug', args = {} }
   end
   return vim.fn.json_decode(parameters_file:read())
 end
@@ -110,12 +135,9 @@ function utils.get_current_target(parameters)
   if target_dir == nil then
     target_dir = target:parent()
   end
-  local arguments = parameters['arguments'][target_info['name']]
-  return target_dir, target, arguments
-end
-
-function utils.asyncrun_callback(function_string)
-  vim.api.nvim_command('autocmd User AsyncRunStop ++once if g:asyncrun_status ==? "success" | call luaeval("' .. function_string .. '") | endif')
+  local args = parameters['args']
+  local target_args = args and split_args(parameters['args'][target_info['name']]) or {}
+  return target_dir, target, target_args
 end
 
 function utils.copy_compile_commands()
@@ -147,6 +169,29 @@ function utils.check_debugging_build_type(parameters)
     return false
   end
   return true
+end
+
+function utils.run(cmd, args, opts)
+  vim.fn.setqflist({}, ' ', { title = cmd .. ' ' .. table.concat(args, ' ') })
+  vim.api.nvim_command('copen ' .. config.quickfix_height)
+  vim.api.nvim_command('wincmd p')
+
+  utils.last_job = Job:new({
+    command = cmd,
+    args = args,
+    cwd = opts.cwd,
+    on_stdout = print_output,
+    on_stderr = print_output,
+    on_exit = vim.schedule_wrap(function(_, exit_code)
+      vim.fn.setqflist({}, 'a', { lines = { 'Exited with code ' .. exit_code } })
+      if exit_code == 0 and opts.on_success then
+        opts.on_success()
+      end
+    end),
+  })
+
+  utils.last_job:start()
+  return utils.last_job
 end
 
 return utils
