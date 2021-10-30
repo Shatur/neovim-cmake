@@ -52,7 +52,7 @@ function utils.get_build_dir(parameters)
   end
 
   local build_dir = tostring(config.build_dir)
-  build_dir = build_dir:gsub('{cwd}', vim.fn.getcwd())
+  build_dir = build_dir:gsub('{cwd}', vim.loop.cwd())
   build_dir = build_dir:gsub('{os}', os)
   build_dir = build_dir:gsub('{build_type}', parameters['buildType']:lower())
   return Path:new(build_dir)
@@ -142,7 +142,7 @@ end
 
 function utils.copy_compile_commands()
   local compile_commands = utils.get_build_dir() / 'compile_commands.json'
-  local destination = Path:new(vim.fn.getcwd(), 'compile_commands.json')
+  local destination = Path:new(vim.loop.cwd(), 'compile_commands.json')
   destination:rm()
   compile_commands:copy({ destination = destination.filename })
 end
