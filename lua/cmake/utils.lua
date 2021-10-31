@@ -4,13 +4,18 @@ local config = require('cmake.config')
 local scandir = require('plenary.scandir')
 local utils = { last_job = nil }
 
-local function print_output(error, data)
-    vim.schedule(function()
-      vim.fn.setqflist({}, 'a', { lines = { error and error or data } })
-      if vim.bo.buftype ~= 'quickfix' then
-        vim.api.nvim_command('cbottom')
-      end
-    end)
+local function append_to_quickfix(line)
+  vim.fn.setqflist({}, 'a', { lines = { line } })
+  -- Scrolls the quickfix buffer if not active
+  if vim.bo.buftype ~= 'quickfix' then
+    vim.api.nvim_command('cbottom')
+  end
+end
+
+local function process_program_output(error, data)
+  vim.schedule(function()
+    append_to_quickfix(error and error or data)
+  end)
 end
 
 function utils.notify(msg, log_level)
@@ -41,10 +46,10 @@ function utils.run(cmd, args, opts)
     command = cmd,
     args = args,
     cwd = opts.cwd,
-    on_stdout = print_output,
-    on_stderr = print_output,
+    on_stdout = process_program_output,
+    on_stderr = process_program_output,
     on_exit = vim.schedule_wrap(function(_, exit_code)
-      vim.fn.setqflist({}, 'a', { lines = { 'Exited with code ' .. exit_code } })
+      append_to_quickfix('Exited with code ' .. exit_code)
       if exit_code == 0 and opts.on_success then
         opts.on_success()
       end
