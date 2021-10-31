@@ -10,6 +10,10 @@ function cmake.setup(values)
 end
 
 function cmake.configure(...)
+  if not utils.ensure_no_job_active() then
+    return
+  end
+
   local cmakelists = Path:new('CMakeLists.txt')
   if not cmakelists:is_file() then
     utils.notify('Unable to find ' .. cmakelists.filename, vim.log.levels.ERROR)
@@ -28,6 +32,10 @@ function cmake.configure(...)
 end
 
 function cmake.build(...)
+  if not utils.ensure_no_job_active() then
+    return
+  end
+
   local project_config = ProjectConfig:new()
   if not project_config.json.current_target then
     utils.notify('You need to select target first', vim.log.levels.ERROR)
@@ -40,11 +48,19 @@ function cmake.build(...)
 end
 
 function cmake.build_all(...)
+  if not utils.ensure_no_job_active() then
+    return
+  end
+
   local project_config = ProjectConfig:new()
   return utils.run('cmake', { '--build', project_config:get_build_dir().filename, ... }, { on_success = project_config:copy_compile_commands() })
 end
 
 function cmake.run(...)
+  if not utils.ensure_no_job_active() then
+    return
+  end
+
   local project_config = ProjectConfig:new()
   local target_dir, target, args = project_config:get_current_target()
   if not target then
@@ -56,6 +72,10 @@ function cmake.run(...)
 end
 
 function cmake.debug(...)
+  if not utils.ensure_no_job_active() then
+    return
+  end
+
   local project_config = ProjectConfig:new()
   if not project_config:validate_for_debugging() then
     return
@@ -82,6 +102,10 @@ function cmake.debug(...)
 end
 
 function cmake.clean(...)
+  if not utils.ensure_no_job_active() then
+    return
+  end
+
   local project_config = ProjectConfig:new()
   local args = { '--build', project_config:get_build_dir().filename, '--target', 'clean' }
   vim.list_extend(args, { ... })
@@ -89,6 +113,10 @@ function cmake.clean(...)
 end
 
 function cmake.build_and_run(...)
+  if not utils.ensure_no_job_active() then
+    return
+  end
+
   if not ProjectConfig:new():get_current_executable_info() then
     return
   end
@@ -99,6 +127,10 @@ function cmake.build_and_run(...)
 end
 
 function cmake.build_and_debug(...)
+  if not utils.ensure_no_job_active() then
+    return
+  end
+
   local project_config = ProjectConfig:new()
   if not project_config:get_current_executable_info() or not project_config:validate_for_debugging() then
     return

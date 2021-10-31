@@ -2,7 +2,7 @@ local Job = require('plenary.job')
 local Path = require('plenary.path')
 local config = require('cmake.config')
 local scandir = require('plenary.scandir')
-local utils = { last_job = nil }
+local utils = {}
 
 local function append_to_quickfix(line)
   vim.fn.setqflist({}, 'a', { lines = { line } })
@@ -58,6 +58,14 @@ function utils.run(cmd, args, opts)
 
   utils.last_job:start()
   return utils.last_job
+end
+
+function utils.ensure_no_job_active()
+  if not utils.last_job or utils.last_job.is_shutdown then
+    return true
+  end
+  utils.notify('Another job is currently running: ' .. utils.last_job.command, vim.log.levels.ERROR)
+  return false
 end
 
 return utils
