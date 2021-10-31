@@ -71,9 +71,9 @@ The mentioned `parameters_file` will be created for every project with the follo
 ```jsonc
 {
   "args": {}, // A dictionary with target names and their arguments specified as an array.
-  "currentTarget": "", // Current target name.
-  "buildType": "", // Current build type, can be Debug, Release, RelWithDebInfo or MinSizeRel.
-  "runDir": "" // Default working directory for targets. By default is missing, the current target directory will be used
+  "current_target": "", // Current target name.
+  "build_type": "", // Current build type, can be Debug, Release, RelWithDebInfo or MinSizeRel.
+  "run_dir": "" // Default working directory for targets. By default is missing, the current target directory will be used
 }
 ```
 

@@ -9,16 +9,16 @@ local utils = require('cmake.utils')
 local config = require('cmake.config')
 local scandir = require('plenary.scandir')
 local Path = require('plenary.path')
+local ProjectConfig = require('cmake.project_config')
 
 local function select_build_type(opts)
   -- Use dropdown theme by default
   opts = themes.get_dropdown(opts)
 
-  local parameters = utils.get_parameters()
-  local current_build_type = parameters['buildType']
+  local project_config = ProjectConfig:new()
   local types = {}
   for _, type in ipairs({ 'Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel' }) do
-    if type == current_build_type then
+    if type == project_config.json.build_type then
       table.insert(types, 1, type)
     else
       table.insert(types, type)
@@ -34,8 +34,8 @@ local function select_build_type(opts)
     attach_mappings = function(prompt_bufnr)
       local select = function()
         actions.close(prompt_bufnr)
-        parameters['buildType'] = state.get_selected_entry().display
-        utils.set_parameters(parameters)
+        project_config.json.build_type = state.get_selected_entry().display
+        project_config:write()
       end
 
       actions.select_default:replace(select)
@@ -48,22 +48,19 @@ local function select_target(opts)
   -- Use dropdown theme by default
   opts = themes.get_dropdown(opts)
 
-  local parameters = utils.get_parameters()
-  local build_dir = utils.get_build_dir(parameters)
-  if not build_dir:is_dir() then
+  local project_config = ProjectConfig:new()
+  if not project_config:get_build_dir():is_dir() then
     utils.notify('You need to configure first', vim.log.levels.ERROR)
     return
   end
 
   local targets = {}
-  local current_target = parameters['currentTarget']
-  local reply_dir = utils.get_reply_dir(build_dir)
-  for _, target in ipairs(utils.get_codemodel_targets(reply_dir)) do
-    local target_info = utils.get_target_info(reply_dir, target)
+  for _, target in ipairs(project_config:get_codemodel_targets()) do
+    local target_info = project_config:get_target_info(target)
     local target_name = target_info['name']
     if target_name:find('_autogen') == nil then
       local target_type = target_info['type']
-      if target_name == current_target then
+      if target_name == project_config.json.current_target then
         table.insert(targets, 1, { name = target_name, type = target_type:lower():gsub('_', ' ') })
       else
         table.insert(targets, { name = target_name, type = target_type:lower():gsub('_', ' ') })
@@ -87,8 +84,8 @@ local function select_target(opts)
     attach_mappings = function(prompt_bufnr)
       local select = function()
         actions.close(prompt_bufnr)
-        parameters['currentTarget'] = state.get_selected_entry().value
-        utils.set_parameters(parameters)
+        project_config.json.current_target = state.get_selected_entry().value
+        project_config:write()
       end
 
       actions.select_default:replace(select)
