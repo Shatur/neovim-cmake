@@ -55,9 +55,9 @@ To configure the plugin, you can call `require('cmake').setup(values)`, where `v
 local Path = require('plenary.path')
 require('cmake').setup({
   parameters_file = 'neovim.json', -- JSON file to store information about selected target, run arguments and build type.
-  build_dir = Path:new('{cwd}', 'build', '{os}-{build_type}'), -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values.
-  samples_path = script_path:parent():parent():parent() / 'samples', -- Folder with samples. `samples` folder from the plugin directory is used by default.
-  default_projects_path = Path:new(vim.loop.os_homedir(), 'Projects'), -- Default folder for creating project.
+  build_dir = tostring(Path:new('{cwd}', 'build', '{os}-{build_type}')), -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values.
+  samples_path = tostring(script_path:parent():parent():parent() / 'samples'), -- Folder with samples. `samples` folder from the plugin directory is used by default.
+  default_projects_path = tostring(Path:new(vim.loop.os_homedir(), 'Projects')), -- Default folder for creating project.
   configure_args = { '-D', 'CMAKE_EXPORT_COMPILE_COMMANDS=1' }, -- Default arguments that will be always passed at cmake configure step. By default tells cmake to generate `compile_commands.json`.
   build_args = {}, -- Default arguments that will be always passed at cmake build step.
   quickfix_height = 10, -- Height of the opened quickfix.

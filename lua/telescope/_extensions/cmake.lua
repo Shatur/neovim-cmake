@@ -101,7 +101,7 @@ local function create_project(opts)
   pickers.new(opts, {
     prompt_title = 'Select sample',
     finder = finders.new_table({
-      results = vim.fn.map(scandir.scan_dir(tostring(config.samples_path), { depth = 1, only_dirs = true }), 'fnamemodify(v:val, ":t")'),
+      results = vim.fn.map(scandir.scan_dir(config.samples_path, { depth = 1, only_dirs = true }), 'fnamemodify(v:val, ":t")'),
     }),
     sorter = sorters.get_fzy_sorter(),
     attach_mappings = function(prompt_bufnr)
@@ -114,7 +114,7 @@ local function create_project(opts)
           return
         end
 
-        local project_location = vim.fn.input('Create in: ', tostring(config.default_projects_path), 'file')
+        local project_location = vim.fn.input('Create in: ', config.default_projects_path, 'file')
         if #project_location == 0 then
           utils.notify('Project path cannot be empty', vim.log.levels.ERROR)
           return

@@ -4,9 +4,9 @@ local script_path = Path:new(debug.getinfo(1).source:sub(2))
 local config = {
   defaults = {
     parameters_file = 'neovim.json',
-    build_dir = Path:new('{cwd}', 'build', '{os}-{build_type}'),
-    samples_path = script_path:parent():parent():parent() / 'samples',
-    default_projects_path = Path:new(vim.loop.os_homedir(), 'Projects'),
+    build_dir = tostring(Path:new('{cwd}', 'build', '{os}-{build_type}')),
+    samples_path = tostring(script_path:parent():parent():parent() / 'samples'),
+    default_projects_path = tostring(Path:new(vim.loop.os_homedir(), 'Projects')),
     configure_args = { '-D', 'CMAKE_EXPORT_COMPILE_COMMANDS=1' },
     build_args = {},
     quickfix_height = 10,
