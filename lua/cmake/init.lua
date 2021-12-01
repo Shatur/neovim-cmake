@@ -20,7 +20,7 @@ function cmake.configure(...)
     return
   end
 
-  local project_config = ProjectConfig:new()
+  local project_config = ProjectConfig.new()
   project_config:get_build_dir():mkdir({ parents = true })
   if not project_config:make_query_files() then
     return
@@ -36,7 +36,7 @@ function cmake.build(...)
     return
   end
 
-  local project_config = ProjectConfig:new()
+  local project_config = ProjectConfig.new()
   if not project_config.json.current_target then
     utils.notify('You need to select target first', vim.log.levels.ERROR)
     return
@@ -52,7 +52,7 @@ function cmake.build_all(...)
     return
   end
 
-  local project_config = ProjectConfig:new()
+  local project_config = ProjectConfig.new()
   return utils.run('cmake', { '--build', project_config:get_build_dir().filename, ... }, { on_success = project_config:copy_compile_commands() })
 end
 
@@ -61,7 +61,7 @@ function cmake.run(...)
     return
   end
 
-  local project_config = ProjectConfig:new()
+  local project_config = ProjectConfig.new()
   local target_dir, target, args = project_config:get_current_target()
   if not target then
     return
@@ -76,7 +76,7 @@ function cmake.debug(...)
     return
   end
 
-  local project_config = ProjectConfig:new()
+  local project_config = ProjectConfig.new()
   if not project_config:validate_for_debugging() then
     return
   end
@@ -106,7 +106,7 @@ function cmake.clean(...)
     return
   end
 
-  local project_config = ProjectConfig:new()
+  local project_config = ProjectConfig.new()
   local args = { '--build', project_config:get_build_dir().filename, '--target', 'clean' }
   vim.list_extend(args, { ... })
   return utils.run('cmake', args, { on_success = project_config:copy_compile_commands() })
@@ -117,7 +117,7 @@ function cmake.build_and_run(...)
     return
   end
 
-  if not ProjectConfig:new():get_current_executable_info() then
+  if not ProjectConfig.new():get_current_executable_info() then
     return
   end
 
@@ -131,7 +131,7 @@ function cmake.build_and_debug(...)
     return
   end
 
-  local project_config = ProjectConfig:new()
+  local project_config = ProjectConfig.new()
   if not project_config:get_current_executable_info() or not project_config:validate_for_debugging() then
     return
   end
@@ -142,7 +142,7 @@ function cmake.build_and_debug(...)
 end
 
 function cmake.set_target_args()
-  local project_config = ProjectConfig:new()
+  local project_config = ProjectConfig.new()
   local current_target = project_config:get_current_executable_info()
   if not current_target then
     return
@@ -154,7 +154,7 @@ function cmake.set_target_args()
 end
 
 function cmake.clear_cache()
-  local cache_file = ProjectConfig:new():get_build_dir() / 'CMakeCache.txt'
+  local cache_file = ProjectConfig.new():get_build_dir() / 'CMakeCache.txt'
   if not cache_file:is_file() then
     utils.notify('Cache file ' .. cache_file.filename .. ' does not exists', vim.log.levels.ERROR)
     return
@@ -165,7 +165,7 @@ end
 
 function cmake.open_build_dir()
   local program = vim.fn.has('win32') == 1 and 'start ' or 'xdg-open '
-  vim.fn.system(program .. ProjectConfig:new():get_build_dir().filename)
+  vim.fn.system(program .. ProjectConfig.new():get_build_dir().filename)
 end
 
 function cmake.cancel()

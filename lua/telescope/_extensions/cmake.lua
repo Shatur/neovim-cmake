@@ -15,7 +15,7 @@ local function select_build_type(opts)
   -- Use dropdown theme by default
   opts = themes.get_dropdown(opts)
 
-  local project_config = ProjectConfig:new()
+  local project_config = ProjectConfig.new()
   local types = {}
   for _, type in ipairs({ 'Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel' }) do
     if type == project_config.json.build_type then
@@ -48,7 +48,7 @@ local function select_target(opts)
   -- Use dropdown theme by default
   opts = themes.get_dropdown(opts)
 
-  local project_config = ProjectConfig:new()
+  local project_config = ProjectConfig.new()
   if not project_config:get_build_dir():is_dir() then
     utils.notify('You need to configure first', vim.log.levels.ERROR)
     return

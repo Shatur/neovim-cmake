@@ -25,7 +25,7 @@ local function split_args(args)
   return splitted_args
 end
 
-function ProjectConfig:new()
+function ProjectConfig.new()
   local project_config = {}
   local parameters_file = Path:new(config.parameters_file)
   if parameters_file:is_file() then
