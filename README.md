@@ -85,9 +85,11 @@ To make CMake telescope pickers available you should call `require('telescope').
 
 ```lua
 require('cmake').setup({
-  type = 'codelldb',
-  request = 'launch',
-  stopOnEntry = false,
-  runInTerminal = false,
+  dap_configuration = {
+    type = 'codelldb',
+    request = 'launch',
+    stopOnEntry = false,
+    runInTerminal = false,
+  }
 })
 ```
