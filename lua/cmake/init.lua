@@ -121,7 +121,7 @@ function cmake.build_and_run(...)
     return
   end
 
-  return cmake.build(...):after(function()
+  return cmake.build(...):after_success(function()
     vim.schedule(cmake.run)
   end)
 end
