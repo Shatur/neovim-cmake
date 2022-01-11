@@ -1,6 +1,7 @@
 local dap = require('dap')
 local utils = require('cmake.utils')
 local config = require('cmake.config')
+local scandir = require('plenary.scandir')
 local Path = require('plenary.path')
 local ProjectConfig = require('cmake.project_config')
 local cmake = {}
@@ -166,6 +167,88 @@ end
 function cmake.open_build_dir()
   local program = vim.fn.has('win32') == 1 and 'start ' or 'xdg-open '
   vim.fn.system(program .. ProjectConfig.new():get_build_dir().filename)
+end
+
+function cmake.select_build_type()
+  -- Put selected build type first
+  local project_config = ProjectConfig.new()
+  local types = { 'Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel' }
+  for idx, type in ipairs(types) do
+    if type == project_config.json.build_type then
+      table.insert(types, 1, table.remove(types, idx))
+      break
+    end
+  end
+
+  vim.ui.select(types, { prompt = 'Select build type' }, function(build_type)
+    project_config.json.build_type = build_type
+    project_config:write()
+  end)
+end
+
+function cmake.select_target()
+  local project_config = ProjectConfig.new()
+  if not project_config:get_build_dir():is_dir() then
+    utils.notify('You need to configure first', vim.log.levels.ERROR)
+    return
+  end
+
+  local targets = {}
+  local display_targets = {}
+  for _, target in ipairs(project_config:get_codemodel_targets()) do
+    local target_info = project_config:get_target_info(target)
+    local target_name = target_info['name']
+    if target_name:find('_autogen') == nil then
+      local display_name = target_name .. ' (' .. target_info['type']:lower():gsub('_', ' ') .. ')'
+      if target_name == project_config.json.current_target then
+        table.insert(targets, 1, target_name)
+        table.insert(display_targets, 1, display_name)
+      else
+        table.insert(targets, target_name)
+        table.insert(display_targets, display_name)
+      end
+    end
+  end
+
+  vim.ui.select(display_targets, { prompt = 'Select target' }, function(_, idx)
+    project_config.json.current_target = targets[idx]
+    project_config:write()
+  end)
+end
+
+function cmake.create_project()
+  local samples = vim.fn.map(scandir.scan_dir(config.samples_path, { depth = 1, only_dirs = true }), 'fnamemodify(v:val, ":t")')
+  vim.ui.select(samples, { prompt = 'Select sample' }, function(sample)
+    if not sample then
+      return
+    end
+    vim.ui.input({ prompt = 'Project name: ' }, function(project_name)
+      if not project_name then
+        utils.notify('Project name cannot be empty', vim.log.levels.ERROR)
+        return
+      end
+
+      vim.ui.input({ prompt = 'Create in: ', default = config.default_projects_path, completion = 'file' }, function(project_location)
+        if not project_location then
+          utils.notify('Project path cannot be empty', vim.log.levels.ERROR)
+          return
+        end
+
+        project_location = Path:new(project_location)
+        project_location:mkdir({ parents = true })
+
+        local project_path = project_location / project_name
+        if project_path:exists() then
+          utils.notify('Path ' .. project_path .. ' is already exists', vim.log.levels.ERROR)
+          return
+        end
+
+        utils.copy_folder(Path:new(config.samples_path) / sample, project_path)
+        vim.api.nvim_command('edit ' .. project_path:joinpath('CMakeLists.txt').filename)
+        vim.api.nvim_command('cd %:h')
+      end)
+    end)
+  end)
 end
 
 function cmake.cancel()

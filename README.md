@@ -5,7 +5,7 @@ A Neovim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/ma
 ## Dependencies
 
 - [cmake](https://cmake.org) for building and reading project information.
-- [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) to select targets, build types and samples.
+- [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for internal helpers.
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap) for debugging.
 
 ## Commands
@@ -23,28 +23,24 @@ Use the command `:CMake` with one of the following arguments:
 | `build_and_run ...`    | Execute `CMake build` and, if build successful, then `CMake run`. Additional arguments will be passed to CMake.                                                                                                                             |
 | `build_and_debug ...`  | Execute `CMake build` and, if build successful, then `CMake debug`. Additional arguments will be passed to CMake.                                                                                                                           |
 | `set_target_arguments` | Set arguments for running / debugging target.                                                                                                                                                                                               |
-| `clear_cache`          | Removes `CMakeCache.txt` file from the build directory.                                                                                                                                                                                     |
+| `clear_cache`          | Remove `CMakeCache.txt` file from the build directory.                                                                                                                                                                                      |
 | `open_build_dir`       | Open current build folder via `xdg-open` (Linux) or `start` (Windows).                                                                                                                                                                      |
+| `select_build_type`    | Select build type (Release, Debug, etc.).                                                                                                                                                                                                   |
+| `select_target`        | Select target for running / debugging.                                                                                                                                                                                                      |
+| `create_project`       | Create new CMake project.                                                                                                                                                                                                                   |
+| `cancel`               | Cancel current running CMake action like `build` or `run`.                                                                                                                                                                                  |
 
 If no arguments are specified, then `configure` will be executed.
 
 Also the corresponding Lua functions with the same names as the arguments are available from [require('cmake')](lua/cmake/init.lua).
 
-Use `:Telescope cmake` with one for the following arguments:
-
-| Argument            | Description                               |
-| ------------------- | ----------------------------------------- |
-| `select_build_type` | Select build type (Release, Debug, etc.). |
-| `select_target`     | Select target for running / debugging.    |
-| `create_project`    | Create new CMake project.                 |
-
-Also the corresponding Lua functions with the same names as the arguments are available from [require('telescope').extensions.cmake](lua/telescope/_extensions/cmake.lua).
+Commands `select_build_type`, `select_target` and `create_project` use `vim.ui.select()`. To use your favorite picker like Telescope, consider installing [dressing.nvim](https://github.com/stevearc/dressing.nvim) or [telescope-ui-select.nvim](https://github.com/nvim-telescope/telescope-ui-select.nvim).
 
 ## Simple usage example
 
-1. Create a new project (`:Telescope cmake create_project`) or open an existing.
+1. Create a new project (`:CMake create_project`) or open an existing.
 2. Configure project (`:CMake configure`) to create build folder and get targets information
-3. Select target to execute (`:Telescope select_target`).
+3. Select target to execute (`:CMake select_target`).
 4. Build and run (`:CMake build_and_run`)
 
 ## Configuration
@@ -77,9 +73,7 @@ The mentioned `parameters_file` will be created for every project with the follo
 }
 ```
 
-Usually you don't need to edit it manually, you can set its values using the `:Telescope cmake <command>` commands.
-
-To make CMake telescope pickers available you should call `require('telescope').load_extension('cmake')`.
+Usually you don't need to edit it manually, you can set its values using the `:CMake <command>` commands.
 
 ### CodeLLDB DAP configuration example
 

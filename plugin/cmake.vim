@@ -1,3 +1,8 @@
+if !has('nvim-0.6.0')
+  echoerr 'neovim-cmake requires at least nvim-0.6.0'
+  finish
+end
+
 if exists('g:loaded_cmake')
   finish
 endif
