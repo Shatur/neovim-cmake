@@ -181,6 +181,9 @@ function cmake.select_build_type()
   end
 
   vim.ui.select(types, { prompt = 'Select build type' }, function(build_type)
+    if not build_type then
+      return
+    end
     project_config.json.build_type = build_type
     project_config:write()
   end)
@@ -211,6 +214,9 @@ function cmake.select_target()
   end
 
   vim.ui.select(display_targets, { prompt = 'Select target' }, function(_, idx)
+    if not idx then
+      return
+    end
     project_config.json.current_target = targets[idx]
     project_config:write()
   end)
