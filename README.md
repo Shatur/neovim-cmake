@@ -50,6 +50,7 @@ To configure the plugin, you can call `require('cmake').setup(values)`, where `v
 ```lua
 local Path = require('plenary.path')
 require('cmake').setup({
+  cmake_executable = 'cmake', -- CMake executable to run.
   parameters_file = 'neovim.json', -- JSON file to store information about selected target, run arguments and build type.
   build_dir = tostring(Path:new('{cwd}', 'build', '{os}-{build_type}')), -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values.
   samples_path = tostring(script_path:parent():parent():parent() / 'samples'), -- Folder with samples. `samples` folder from the plugin directory is used by default.

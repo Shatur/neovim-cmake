@@ -3,6 +3,7 @@ local script_path = Path:new(debug.getinfo(1).source:sub(2))
 
 local config = {
   defaults = {
+    cmake_executable = 'cmake',
     parameters_file = 'neovim.json',
     build_dir = tostring(Path:new('{cwd}', 'build', '{os}-{build_type}')),
     samples_path = tostring(script_path:parent():parent():parent() / 'samples'),
