@@ -48,7 +48,10 @@ function ProjectConfig:get_build_dir()
   if self.build_dir then
     return self.build_dir
   end
-
+  if vim.is_callable(config.build_dir) then
+    self.build_dir = Path:new(config.build_dir())
+    return self.build_dir
+  end
   self.build_dir = config.build_dir
   self.build_dir = self.build_dir:gsub('{cwd}', vim.loop.cwd())
   self.build_dir = self.build_dir:gsub('{os}', os)
