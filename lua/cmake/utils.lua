@@ -11,8 +11,8 @@ local function append_to_quickfix(error, data)
   if vim.bo.buftype ~= 'quickfix' then
     vim.api.nvim_command('cbottom')
   end
-  if config.build_on_output then
-    config.build_on_output(line)
+  if config.on_build_output then
+    config.on_build_output(line)
   end
 end
 
@@ -42,8 +42,8 @@ end
 
 function utils.run(cmd, args, opts)
   vim.fn.setqflist({}, ' ', { title = cmd .. ' ' .. table.concat(args, ' ') })
-  if not config.quickfix_if_error then
-    go_to_quickfix()
+  if not config.quickfix_only_on_error then
+    show_quickfix()
   end
 
   utils.last_job = Job:new({
@@ -58,8 +58,8 @@ function utils.run(cmd, args, opts)
         if opts.on_success then
           opts.on_success()
         end
-      elseif config.quickfix_if_error then
-        go_to_quickfix()
+      elseif config.quickfix_only_on_error then
+        show_quickfix()
         vim.api.nvim_command('cbottom')
       end
     end),

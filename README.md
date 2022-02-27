@@ -94,14 +94,14 @@ require('cmake').setup({
 ### Advanced usage examples
 
 ```lua
-g_line = ""  -- can be displayed in statusline, updated in build_on_output
+progress = ""  -- can be displayed in statusline, updated in build_on_output
 
 require('cmake').setup({
   quickfix_if_error = true,
   build_on_output = function(line)
     local match = string.match(line, "(%[.*%])")
     if match then
-      g_line = string.gsub(match, "%%", "%%%%")
+      progress = string.gsub(match, "%%", "%%%%")
     end
   end
 })
