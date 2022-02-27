@@ -5,11 +5,20 @@ local scandir = require('plenary.scandir')
 local utils = {}
 
 local function append_to_quickfix(error, data)
-  vim.fn.setqflist({}, 'a', { lines = { error and error or data } })
+  local line = error and error or data
+  vim.fn.setqflist({}, 'a', { lines = { line } })
   -- Scrolls the quickfix buffer if not active
   if vim.bo.buftype ~= 'quickfix' then
     vim.api.nvim_command('cbottom')
   end
+  if config.on_build_output then
+    config.on_build_output(line)
+  end
+end
+
+local function show_quickfix()
+  vim.api.nvim_command('copen ' .. config.quickfix_height)
+  vim.api.nvim_command('wincmd p')
 end
 
 function utils.notify(msg, log_level)
@@ -33,8 +42,9 @@ end
 
 function utils.run(cmd, args, opts)
   vim.fn.setqflist({}, ' ', { title = cmd .. ' ' .. table.concat(args, ' ') })
-  vim.api.nvim_command('copen ' .. config.quickfix_height)
-  vim.api.nvim_command('wincmd p')
+  if not config.quickfix_only_on_error then
+    show_quickfix()
+  end
 
   utils.last_job = Job:new({
     command = cmd,
@@ -44,8 +54,13 @@ function utils.run(cmd, args, opts)
     on_stderr = vim.schedule_wrap(append_to_quickfix),
     on_exit = vim.schedule_wrap(function(_, exit_code)
       append_to_quickfix('Exited with code ' .. exit_code)
-      if exit_code == 0 and opts.on_success then
-        opts.on_success()
+      if exit_code == 0 then
+        if opts.on_success then
+          opts.on_success()
+        end
+      elseif config.quickfix_only_on_error then
+        show_quickfix()
+        vim.api.nvim_command('cbottom')
       end
     end),
   })
