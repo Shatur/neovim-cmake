@@ -59,7 +59,7 @@ function utils.run(cmd, args, opts)
         if opts.on_success then
           opts.on_success()
         end
-      elseif config.quickfix_only_on_error then
+      elseif not opts.show_quickfix then
         show_quickfix()
         vim.api.nvim_command('cbottom')
       end
