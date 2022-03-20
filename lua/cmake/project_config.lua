@@ -132,7 +132,10 @@ function ProjectConfig:get_current_target()
     return nil
   end
 
-  local target = self:get_build_dir() / target_info['artifacts'][1]['path']
+  local target = Path:new(target_info['artifacts'][1]['path'])
+  if not target:is_absolute() then
+    target = self:get_build_dir() / target
+  end
   if not target:is_file() then
     utils.notify('Selected target is not built: ' .. target.filename, vim.log.levels.ERROR)
     return nil
