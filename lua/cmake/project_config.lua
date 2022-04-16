@@ -1,6 +1,7 @@
 local config = require('cmake.config')
 local os = require('ffi').os:lower()
 local utils = require('cmake.utils')
+local scandir = require('plenary.scandir')
 local Path = require('plenary.path')
 local ProjectConfig = {}
 ProjectConfig.__index = ProjectConfig
@@ -29,7 +30,7 @@ function ProjectConfig.new()
   local project_config = {}
   local parameters_file = Path:new(config.parameters_file)
   if parameters_file:is_file() then
-    project_config.json = vim.fn.json_decode(parameters_file:read())
+    project_config.json = vim.json.decode(parameters_file:read())
   else
     project_config.json = {}
   end
@@ -39,7 +40,7 @@ end
 
 function ProjectConfig:write()
   local parameters_file = Path:new(config.parameters_file)
-  parameters_file:write(vim.fn.json_encode(self.json), 'w')
+  parameters_file:write(vim.json.encode(self.json), 'w')
 end
 
 function ProjectConfig:get_build_dir()
@@ -67,13 +68,18 @@ function ProjectConfig:get_reply_dir()
 end
 
 function ProjectConfig:get_codemodel_targets()
-  local codemodel = Path:new(vim.fn.globpath(self:get_reply_dir().filename, 'codemodel*'))
-  local codemodel_json = vim.fn.json_decode(codemodel:read())
+  local found_files = scandir.scan_dir(self:get_reply_dir().filename, { search_pattern = 'codemodel*' })
+  if #found_files == 0 then
+    utils.notify('Unable to find codemodel file', vim.log.levels.ERROR)
+    return {}
+  end
+  local codemodel = Path:new(found_files[1])
+  local codemodel_json = vim.json.decode(codemodel:read())
   return codemodel_json['configurations'][1]['targets']
 end
 
 function ProjectConfig:get_target_info(codemodel_target)
-  return vim.fn.json_decode((self:get_reply_dir() / codemodel_target['jsonFile']):read())
+  return vim.json.decode((self:get_reply_dir() / codemodel_target['jsonFile']):read())
 end
 
 -- Tell CMake to generate codemodel

@@ -3,6 +3,7 @@ local utils = require('cmake.utils')
 local config = require('cmake.config')
 local scandir = require('plenary.scandir')
 local Path = require('plenary.path')
+local Job = require('plenary.job')
 local ProjectConfig = require('cmake.project_config')
 local cmake = {}
 
@@ -154,8 +155,12 @@ function cmake.set_target_args()
   end
 
   local current_target_name = current_target['name']
-  project_config.json.args[current_target_name] = vim.fn.input(current_target_name .. ' arguments: ', project_config.json.args[current_target_name] or '', 'file')
-  project_config:write()
+  vim.ui.input({ prompt = current_target_name .. ' arguments: ', default = project_config.json.args[current_target_name] or '', completion = 'file' }, function(input)
+    if input then
+      project_config.json.args[current_target_name] = input
+      project_config:write()
+    end
+  end)
 end
 
 function cmake.clear_cache()
@@ -169,8 +174,11 @@ function cmake.clear_cache()
 end
 
 function cmake.open_build_dir()
-  local program = vim.fn.has('win32') == 1 and 'start ' or 'xdg-open '
-  vim.fn.system(program .. ProjectConfig.new():get_build_dir().filename)
+  local job = Job:new({
+    command = vim.fn.has('unix') == 1 and 'xdg-open' or 'start',
+    args = { ProjectConfig.new():get_build_dir().filename },
+  })
+  job:start()
 end
 
 function cmake.select_build_type()
@@ -227,7 +235,11 @@ function cmake.select_target()
 end
 
 function cmake.create_project()
-  local samples = vim.fn.map(scandir.scan_dir(config.samples_path, { depth = 1, only_dirs = true }), 'fnamemodify(v:val, ":t")')
+  local samples = scandir.scan_dir(config.samples_path, { depth = 1, only_dirs = true })
+  for index, sample in ipairs(samples) do
+    samples[index] = vim.fn.fnamemodify(sample, ':t')
+  end
+
   vim.ui.select(samples, { prompt = 'Select sample' }, function(sample)
     if not sample then
       return

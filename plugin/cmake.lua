@@ -1,5 +1,5 @@
 if not vim.fn.has('nvim-0.7.0') then
-  vim.notify('Neovim 0.7+ is required for ayu colorscheme')
+  require('cmake.utils').notify('Neovim 0.7+ is required for cmake plugin', vim.log.levels.ERROR)
   return
 end
 
