@@ -12,17 +12,17 @@ function commands.match_commands(arg)
   return matches
 end
 
-function commands.run_command(command, ...)
-  if not command then
+function commands.run_command(command)
+  if #command.fargs == 0 then
     cmake.configure()
     return
   end
-  local command_func = cmake[command]
+  local command_func = cmake[command.fargs[1]]
   if not command_func then
-    utils.notify('No such command: ' .. command, vim.log.levels.ERROR)
+    utils.notify('No such command: ' .. command.fargs[1], vim.log.levels.ERROR)
     return
   end
-  command_func(...)
+  command_func(vim.list_slice(command.fargs, 2, #command.fargs))
 end
 
 return commands

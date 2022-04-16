@@ -10,7 +10,7 @@ function cmake.setup(values)
   setmetatable(config, { __index = vim.tbl_extend('force', config.defaults, values) })
 end
 
-function cmake.configure(...)
+function cmake.configure(args)
   if not utils.ensure_no_job_active() then
     return
   end
@@ -27,12 +27,12 @@ function cmake.configure(...)
     return
   end
 
-  local args = { '-B', project_config:get_build_dir().filename, '-D', 'CMAKE_BUILD_TYPE=' .. project_config.json.build_type, unpack(config.configure_args) }
-  vim.list_extend(args, { ... })
+  args = args or {}
+  vim.list_extend(args, { '-B', project_config:get_build_dir().filename, '-D', 'CMAKE_BUILD_TYPE=' .. project_config.json.build_type, unpack(config.configure_args) })
   return utils.run(config.cmake_executable, args, { on_success = project_config:copy_compile_commands() })
 end
 
-function cmake.build(...)
+function cmake.build(args)
   if not utils.ensure_no_job_active() then
     return
   end
@@ -43,36 +43,39 @@ function cmake.build(...)
     return
   end
 
-  local args = { '--build', project_config:get_build_dir().filename, '--target', project_config.json.current_target, unpack(config.build_args) }
-  vim.list_extend(args, { ... })
+  args = args or {}
+  vim.list_extend(args, { '--build', project_config:get_build_dir().filename, '--target', project_config.json.current_target, unpack(config.build_args) })
   return utils.run(config.cmake_executable, args, { on_success = project_config:copy_compile_commands() })
 end
 
-function cmake.build_all(...)
+function cmake.build_all(args)
   if not utils.ensure_no_job_active() then
     return
   end
 
   local project_config = ProjectConfig.new()
-  return utils.run(config.cmake_executable, { '--build', project_config:get_build_dir().filename, ... }, { on_success = project_config:copy_compile_commands() })
+  args = args or {}
+  vim.list_extend(args, { '--build', project_config:get_build_dir().filename })
+  return utils.run(config.cmake_executable, { on_success = project_config:copy_compile_commands() })
 end
 
-function cmake.run(...)
+function cmake.run(args)
   if not utils.ensure_no_job_active() then
     return
   end
 
   local project_config = ProjectConfig.new()
-  local target_dir, target, args = project_config:get_current_target()
+  local target_dir, target, project_args = project_config:get_current_target()
   if not target then
     return
   end
 
-  vim.list_extend(args, { ... })
+  args = args or {}
+  vim.list_extend(args, project_args)
   return utils.run(target.filename, args, { cwd = target_dir.filename, open_quickfix = true })
 end
 
-function cmake.debug(...)
+function cmake.debug(args)
   if not utils.ensure_no_job_active() then
     return
   end
@@ -82,12 +85,13 @@ function cmake.debug(...)
     return
   end
 
-  local target_dir, target, args = project_config:get_current_target()
+  local target_dir, target, project_args = project_config:get_current_target()
   if not target then
     return
   end
 
-  vim.list_extend(args, { ... })
+  args = args or {}
+  vim.list_extend(args, project_args)
 
   vim.api.nvim_command('cclose')
   local dap_config = {
@@ -102,18 +106,18 @@ function cmake.debug(...)
   end
 end
 
-function cmake.clean(...)
+function cmake.clean(args)
   if not utils.ensure_no_job_active() then
     return
   end
 
   local project_config = ProjectConfig.new()
-  local args = { '--build', project_config:get_build_dir().filename, '--target', 'clean' }
-  vim.list_extend(args, { ... })
+  args = args or {}
+  vim.list_extend(args, { '--build', project_config:get_build_dir().filename, '--target', 'clean' })
   return utils.run(config.cmake_executable, args, { on_success = project_config:copy_compile_commands() })
 end
 
-function cmake.build_and_run(...)
+function cmake.build_and_run(args)
   if not utils.ensure_no_job_active() then
     return
   end
@@ -122,12 +126,12 @@ function cmake.build_and_run(...)
     return
   end
 
-  return cmake.build(...):after_success(function()
+  return cmake.build(args):after_success(function()
     vim.schedule(cmake.run)
   end)
 end
 
-function cmake.build_and_debug(...)
+function cmake.build_and_debug(args)
   if not utils.ensure_no_job_active() then
     return
   end
@@ -137,7 +141,7 @@ function cmake.build_and_debug(...)
     return
   end
 
-  return cmake.build(...):after_success(function()
+  return cmake.build(args):after_success(function()
     vim.schedule(cmake.debug)
   end)
 end

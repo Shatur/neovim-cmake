@@ -1,6 +1,6 @@
 # Neovim CMake
 
-A Neovim plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/manual/cmake-file-api.7.html#codemodel-version-2) to provide integration with building, running and debugging projects with output to quickfix.
+A Neovim 0.7+ plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/manual/cmake-file-api.7.html#codemodel-version-2) to provide integration with building, running and debugging projects with output to quickfix.
 
 ## Dependencies
 
