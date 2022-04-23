@@ -57,7 +57,7 @@ function cmake.build_all(args)
   local project_config = ProjectConfig.new()
   args = args or {}
   vim.list_extend(args, { '--build', project_config:get_build_dir().filename })
-  return utils.run(config.cmake_executable, { on_success = project_config:copy_compile_commands() })
+  return utils.run(config.cmake_executable, args, { on_success = project_config:copy_compile_commands() })
 end
 
 function cmake.run(args)
