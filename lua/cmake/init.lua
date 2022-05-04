@@ -44,8 +44,7 @@ function cmake.build(args)
     return
   end
 
-  args = args or {}
-  vim.list_extend(args, { '--build', project_config:get_build_dir().filename, '--target', project_config.json.current_target, unpack(config.build_args) })
+  args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', project_config.json.current_target, unpack(config.build_args) }, args or {})
   return utils.run(config.cmake_executable, args, { on_success = project_config:copy_compile_commands() })
 end
 
@@ -55,8 +54,7 @@ function cmake.build_all(args)
   end
 
   local project_config = ProjectConfig.new()
-  args = args or {}
-  vim.list_extend(args, { '--build', project_config:get_build_dir().filename })
+  args = vim.list_extend({ '--build', project_config:get_build_dir().filename }, args or {})
   return utils.run(config.cmake_executable, args, { on_success = project_config:copy_compile_commands() })
 end
 
@@ -113,8 +111,7 @@ function cmake.clean(args)
   end
 
   local project_config = ProjectConfig.new()
-  args = args or {}
-  vim.list_extend(args, { '--build', project_config:get_build_dir().filename, '--target', 'clean' })
+  args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', 'clean' }, args or {})
   return utils.run(config.cmake_executable, args, { on_success = project_config:copy_compile_commands() })
 end
 
