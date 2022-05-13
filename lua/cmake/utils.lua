@@ -35,7 +35,7 @@ function utils.copy_folder(folder, destination)
         error('Unable to copy ' .. target_entry)
       end
     else
-      utils.copy_folder(folder, target_entry)
+      utils.copy_folder(source_entry, target_entry)
     end
   end
 end
