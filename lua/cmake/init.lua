@@ -153,10 +153,8 @@ function cmake.set_target_args()
 
   local current_target_name = current_target['name']
   vim.ui.input({ prompt = current_target_name .. ' arguments: ', default = project_config.json.args[current_target_name] or '', completion = 'file' }, function(input)
-    if input then
-      project_config.json.args[current_target_name] = input
-      project_config:write()
-    end
+    project_config.json.args[current_target_name] = input
+    project_config:write()
   end)
 end
 
