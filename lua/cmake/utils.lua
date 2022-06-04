@@ -70,6 +70,76 @@ function utils.run(cmd, args, opts)
   return utils.last_job
 end
 
+local function create_terminal_buf(terminal_win_cmd)
+  local cur_win = vim.api.nvim_get_current_win()
+  vim.api.nvim_command(terminal_win_cmd)
+  local bufnr = vim.api.nvim_get_current_buf()
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_set_current_win(cur_win)
+  return bufnr, win
+end
+
+local terminal_buf
+
+function utils.run_in_terminal(cmd, args, opts)
+  local cur_buf = vim.api.nvim_get_current_buf()
+
+  -- TODO: We need to always delete??? otherwise click ZZ will hide it
+  if terminal_buf and vim.api.nvim_buf_is_valid(terminal_buf) then
+    vim.api.nvim_buf_set_option(terminal_buf, 'modified', false)
+  else
+    local terminal_win
+    terminal_buf, terminal_win = create_terminal_buf('belowright new')
+    if terminal_win then
+      vim.wo[terminal_win].number = false
+      vim.wo[terminal_win].relativenumber = false
+      vim.wo[terminal_win].signcolumn = 'no'
+    end
+    vim.api.nvim_win_set_height(terminal_win, config.quickfix_height)
+    vim.api.nvim_buf_set_name(terminal_buf, '[neovim-cmake-terminal]')
+  end
+  local ok, path = pcall(vim.api.nvim_buf_get_option, cur_buf, 'path')
+  if ok then
+    vim.api.nvim_buf_set_option(terminal_buf, 'path', path)
+  end
+  local jobid
+
+  local chan = vim.api.nvim_open_term(terminal_buf, {
+    on_input = function(_, _, _, data)
+      pcall(vim.api.nvim_chan_send, jobid, data)
+    end,
+  })
+
+  jobid = vim.fn.jobstart(cmd, {
+    args = args,
+    cwd = opts.cwd,
+    pty = true,
+    on_stdout = function(_, data)
+      vim.api.nvim_chan_send(chan, table.concat(data, '\n'))
+    end,
+    on_exit = function(_, exit_code)
+      vim.api.nvim_chan_send(chan, '\r\n[Process exited ' .. tostring(exit_code) .. ']')
+      vim.api.nvim_buf_set_keymap(terminal_buf, 't', '<CR>', '<cmd>bd!<CR>', { noremap = true, silent = true })
+    end,
+  })
+
+  local focus_terminal = true
+  if focus_terminal then
+    for _, win in pairs(vim.api.nvim_tabpage_list_wins(0)) do
+      if vim.api.nvim_win_get_buf(win) == terminal_buf then
+        vim.api.nvim_set_current_win(win)
+        break
+      end
+    end
+  end
+  if jobid == 0 or jobid == -1 then
+    vim.notify('Could not spawn terminal', jobid)
+  else
+    -- TODO: Fix
+    vim.notify('Hola')
+  end
+end
+
 function utils.ensure_no_job_active()
   if not utils.last_job or utils.last_job.is_shutdown then
     return true
