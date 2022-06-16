@@ -11,8 +11,10 @@ local config = {
     configure_args = { '-D', 'CMAKE_EXPORT_COMPILE_COMMANDS=1' },
     build_args = {},
     on_build_output = nil,
-    quickfix_height = 10,
-    quickfix_only_on_error = false,
+    quickfix = {
+      height = 10,
+      only_on_error = false,
+    },
     copy_compile_commands = true,
     dap_configuration = { type = 'cpp', request = 'launch' },
     dap_open_command = require('dap').repl.open,

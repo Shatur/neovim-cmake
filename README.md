@@ -58,8 +58,10 @@ require('cmake').setup({
   configure_args = { '-D', 'CMAKE_EXPORT_COMPILE_COMMANDS=1' }, -- Default arguments that will be always passed at cmake configure step. By default tells cmake to generate `compile_commands.json`.
   build_args = {}, -- Default arguments that will be always passed at cmake build step.
   on_build_output = nil, -- Callback which will be called on every line that is printed during build process. Accepts printed line as argument.
-  quickfix_height = 10, -- Height of the opened quickfix.
-  quickfix_only_on_error = false, -- Open quickfix window only if target build failed.
+  quickfix = {
+    height = 10, -- Height of the opened quickfix.
+    only_on_error = false, -- Open quickfix window only if target build failed.
+  },
   copy_compile_commands = true, -- Copy compile_commands.json to current working directory.
   dap_configuration = { type = 'cpp', request = 'launch' }, -- DAP configuration. By default configured to work with `lldb-vscode`.
   dap_open_command = require('dap').repl.open, -- Command to run after starting DAP session. You can set it to `false` if you don't want to open anything or `require('dapui').open` if you are using https://github.com/rcarriga/nvim-dap-ui
@@ -98,7 +100,9 @@ require('cmake').setup({
 progress = ""  -- can be displayed in statusline, updated in on_build_output
 
 require('cmake').setup({
-  quickfix_only_on_error = true,
+  quickfix = {
+    only_on_error = true,
+  },
   on_build_output = function(line)
     local match = string.match(line, "(%[.*%])")
     if match then

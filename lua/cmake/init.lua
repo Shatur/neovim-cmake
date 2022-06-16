@@ -8,7 +8,7 @@ local ProjectConfig = require('cmake.project_config')
 local cmake = {}
 
 function cmake.setup(values)
-  setmetatable(config, { __index = vim.tbl_extend('force', config.defaults, values) })
+  setmetatable(config, { __index = vim.tbl_deep_extend('force', config.defaults, values) })
 end
 
 function cmake.configure(args)

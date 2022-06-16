@@ -17,7 +17,7 @@ local function append_to_quickfix(error, data)
 end
 
 local function show_quickfix()
-  vim.api.nvim_command('copen ' .. config.quickfix_height)
+  vim.api.nvim_command('copen ' .. config.quickfix.height)
   vim.api.nvim_command('wincmd p')
 end
 
@@ -42,7 +42,7 @@ end
 
 function utils.run(cmd, args, opts)
   vim.fn.setqflist({}, ' ', { title = cmd .. ' ' .. table.concat(args, ' ') })
-  opts.force_quickfix = vim.F.if_nil(opts.force_quickfix, not config.quickfix_only_on_error)
+  opts.force_quickfix = vim.F.if_nil(opts.force_quickfix, not config.quickfix.only_on_error)
   if opts.force_quickfix then
     show_quickfix()
   end
