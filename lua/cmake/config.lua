@@ -12,6 +12,7 @@ local config = {
     build_args = {},
     on_build_output = nil,
     quickfix = {
+      pos = 'botright',
       height = 10,
       only_on_error = false,
     },

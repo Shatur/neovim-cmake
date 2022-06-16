@@ -17,7 +17,7 @@ local function append_to_quickfix(error, data)
 end
 
 local function show_quickfix()
-  vim.api.nvim_command('copen ' .. config.quickfix.height)
+  vim.api.nvim_command(config.quickfix.pos .. ' copen ' .. config.quickfix.height)
   vim.api.nvim_command('wincmd p')
 end
 

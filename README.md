@@ -59,6 +59,7 @@ require('cmake').setup({
   build_args = {}, -- Default arguments that will be always passed at cmake build step.
   on_build_output = nil, -- Callback which will be called on every line that is printed during build process. Accepts printed line as argument.
   quickfix = {
+    pos = 'botright', -- Where to open quickfix
     height = 10, -- Height of the opened quickfix.
     only_on_error = false, -- Open quickfix window only if target build failed.
   },
