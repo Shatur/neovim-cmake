@@ -42,8 +42,8 @@ end
 
 function utils.run(cmd, args, opts)
   vim.fn.setqflist({}, ' ', { title = cmd .. ' ' .. table.concat(args, ' ') })
-  opts.open_quickfix = vim.F.if_nil(opts.open_quickfix, not config.quickfix_only_on_error)
-  if opts.open_quickfix then
+  opts.force_quickfix = vim.F.if_nil(opts.force_quickfix, not config.quickfix_only_on_error)
+  if opts.force_quickfix then
     show_quickfix()
   end
 
@@ -59,7 +59,7 @@ function utils.run(cmd, args, opts)
         if opts.on_success then
           opts.on_success()
         end
-      elseif not opts.show_quickfix then
+      elseif not opts.force_quickfix then
         show_quickfix()
         vim.api.nvim_command('cbottom')
       end

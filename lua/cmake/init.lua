@@ -71,7 +71,7 @@ function cmake.run(args)
 
   args = args or {}
   vim.list_extend(args, project_args)
-  return utils.run(target.filename, args, { cwd = target_dir.filename, open_quickfix = true })
+  return utils.run(target.filename, args, { cwd = target_dir.filename, force_quickfix = true })
 end
 
 function cmake.debug(args)
