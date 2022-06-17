@@ -12,7 +12,6 @@ function commands.match_commands(arg, cmd_line)
   end
 
   if words_count == 1 then
-    -- We complete only first arg
     for command in pairs(cmake) do
       if vim.startswith(command, arg) and command ~= 'setup' then
         table.insert(matches, command)
