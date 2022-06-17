@@ -55,11 +55,7 @@ function utils.run(cmd, args, opts)
     on_stderr = vim.schedule_wrap(append_to_quickfix),
     on_exit = vim.schedule_wrap(function(_, code, signal)
       append_to_quickfix('Exited with code ' .. (signal == 0 and code or 128 + signal))
-      if code == 0 and signal == 0 then
-        if opts.on_success then
-          opts.on_success()
-        end
-      elseif not opts.force_quickfix then
+      if (code ~= 0 or signal ~= 0) and opts.force_quickfix then
         show_quickfix()
         vim.api.nvim_command('cbottom')
       end

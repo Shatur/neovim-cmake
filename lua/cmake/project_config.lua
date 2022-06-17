@@ -162,6 +162,10 @@ function ProjectConfig:validate_for_debugging()
 end
 
 function ProjectConfig:copy_compile_commands()
+  if not config.copy_compile_commands then
+    return
+  end
+
   local compile_commands = self:get_build_dir() / 'compile_commands.json'
   local destination = Path:new(vim.loop.cwd(), 'compile_commands.json')
   destination:rm()
