@@ -2,7 +2,18 @@ local cmake = require('cmake')
 local utils = require('cmake.utils')
 local commands = {}
 
-function commands.match_commands(arg)
+function commands.match_commands(arg, cmd_line)
+  local words_count = 0
+  local last_space_pos = 0
+  repeat
+    last_space_pos = string.find(cmd_line, ' ', last_space_pos + 1)
+    words_count = words_count + 1
+  until last_space_pos == nil
+  if words_count > 2 then
+    -- We complete only first arg (2 is for command and its argument)
+    return {}
+  end
+
   local matches = {}
   for command in pairs(cmake) do
     if vim.startswith(command, arg) and command ~= 'setup' then
