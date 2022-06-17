@@ -6,13 +6,12 @@ function commands.match_commands(arg, cmd_line)
   local matches = {}
 
   local words = vim.split(cmd_line, ' ', { trimempty = true })
-  local words_count = #words
   if not vim.endswith(cmd_line, ' ') then
     -- Last word is not fully typed, don't count it
-    words_count = words_count - 1
+    table.remove(words, #words)
   end
 
-  if words_count == 1 then
+  if #words == 1 then
     for command in pairs(cmake) do
       if vim.startswith(command, arg) and command ~= 'setup' then
         table.insert(matches, command)
