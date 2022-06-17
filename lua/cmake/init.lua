@@ -28,8 +28,7 @@ function cmake.configure(args)
     return
   end
 
-  args = args or {}
-  vim.list_extend(args, { '-B', project_config:get_build_dir().filename, '-D', 'CMAKE_BUILD_TYPE=' .. project_config.json.build_type, unpack(config.configure_args) })
+  args = vim.list_extend({ '-B', project_config:get_build_dir().filename, '-D', 'CMAKE_BUILD_TYPE=' .. project_config.json.build_type, unpack(config.configure_args) }, args or {})
   return utils.run(config.cmake_executable, args, { on_success = config.copy_compile_commands and project_config:copy_compile_commands() })
 end
 
@@ -69,8 +68,7 @@ function cmake.run(args)
     return
   end
 
-  args = args or {}
-  vim.list_extend(args, project_args)
+  args = vim.list_extend(project_args, args or {})
   return utils.run(target.filename, args, { cwd = target_dir.filename, force_quickfix = true })
 end
 
@@ -89,8 +87,7 @@ function cmake.debug(args)
     return
   end
 
-  args = args or {}
-  vim.list_extend(args, project_args)
+  args = vim.list_extend(project_args, args or {})
 
   vim.api.nvim_command('cclose')
   local dap_config = {
