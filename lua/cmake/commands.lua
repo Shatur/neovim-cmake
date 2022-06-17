@@ -5,7 +5,8 @@ local commands = {}
 function commands.match_commands(arg, cmd_line)
   local matches = {}
 
-  local _, words_count = cmd_line:gsub('%S+', '')
+  local words = vim.split(cmd_line, ' ', { trimempty = true })
+  local words_count = #words
   if not vim.endswith(cmd_line, ' ') then
     -- Last word is not fully typed, don't count it
     words_count = words_count - 1
