@@ -12,12 +12,6 @@ function cmake.setup(values)
 end
 
 function cmake.configure(args)
-  local cmakelists = Path:new('CMakeLists.txt')
-  if not cmakelists:is_file() then
-    utils.notify('Unable to find ' .. cmakelists.filename, vim.log.levels.ERROR)
-    return
-  end
-
   local project_config = ProjectConfig.new()
   project_config:get_build_dir():mkdir({ parents = true })
   if not project_config:make_query_files() then
@@ -57,7 +51,7 @@ function cmake.run(args)
 end
 
 function cmake.debug(args)
-  if not utils.ensure_no_job_active() then
+  if not utils.ensure_no_job_active() or not utils.ensure_in_cmake_project() then
     return
   end
 
