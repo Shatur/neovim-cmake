@@ -40,6 +40,13 @@ function utils.copy_folder(folder, destination)
   end
 end
 
+function utils.copy_compile_commands(source_folder)
+  local filename = 'compile_commands.json'
+  local source = source_folder / filename
+  local destination = Path:new(vim.loop.cwd(), filename)
+  source:copy({ destination = destination.filename })
+end
+
 function utils.run(cmd, args, opts)
   vim.fn.setqflist({}, ' ', { title = cmd .. ' ' .. table.concat(args, ' ') })
   opts.force_quickfix = vim.F.if_nil(opts.force_quickfix, not config.quickfix.only_on_error)
@@ -55,7 +62,11 @@ function utils.run(cmd, args, opts)
     on_stderr = vim.schedule_wrap(append_to_quickfix),
     on_exit = vim.schedule_wrap(function(_, code, signal)
       append_to_quickfix('Exited with code ' .. (signal == 0 and code or 128 + signal))
-      if (code ~= 0 or signal ~= 0) and opts.force_quickfix then
+      if code == 0 and signal == 0 then
+        if config.copy_compile_commands and opts.copy_compile_commands_from then
+          utils.copy_compile_commands(opts.copy_compile_commands_from)
+        end
+      elseif not opts.force_quickfix then
         show_quickfix()
         vim.api.nvim_command('cbottom')
       end

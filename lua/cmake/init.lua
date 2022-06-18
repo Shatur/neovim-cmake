@@ -29,11 +29,7 @@ function cmake.configure(args)
   end
 
   args = vim.list_extend({ '-B', project_config:get_build_dir().filename, '-D', 'CMAKE_BUILD_TYPE=' .. project_config.json.build_type, unpack(config.configure_args) }, args or {})
-  local job = utils.run(config.cmake_executable, args, {})
-  job:after_success(function()
-    project_config:copy_compile_commands()
-  end)
-  return job
+  return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
 function cmake.build(args)
@@ -48,11 +44,7 @@ function cmake.build(args)
   end
 
   args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', project_config.json.current_target, unpack(config.build_args) }, args or {})
-  local job = utils.run(config.cmake_executable, args, {})
-  job:after_success(function()
-    project_config:copy_compile_commands()
-  end)
-  return job
+  return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
 function cmake.build_all(args)
@@ -62,11 +54,7 @@ function cmake.build_all(args)
 
   local project_config = ProjectConfig.new()
   args = vim.list_extend({ '--build', project_config:get_build_dir().filename, unpack(config.build_args) }, args or {})
-  local job = utils.run(config.cmake_executable, args, {})
-  job:after_success(function()
-    project_config:copy_compile_commands()
-  end)
-  return job
+  return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
 function cmake.run(args)
@@ -121,11 +109,7 @@ function cmake.clean(args)
 
   local project_config = ProjectConfig.new()
   args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', 'clean' }, args or {})
-  local job = utils.run(config.cmake_executable, args, {})
-  job:after_success(function()
-    project_config:copy_compile_commands()
-  end)
-  return job
+  return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
 function cmake.build_and_run(args)
