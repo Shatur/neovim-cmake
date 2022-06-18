@@ -3,6 +3,6 @@ if not vim.fn.has('nvim-0.7.0') then
   return
 end
 
-local cmake_commands = require('cmake.commands')
+local subcommands = require('cmake.subcommands')
 
-vim.api.nvim_create_user_command('CMake', cmake_commands.run_command, { nargs = '*', complete = cmake_commands.match_commands, desc = 'Run CMake command' })
+vim.api.nvim_create_user_command('CMake', subcommands.run, { nargs = '*', complete = subcommands.match, desc = 'Run CMake command' })
