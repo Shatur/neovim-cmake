@@ -54,7 +54,7 @@ function cmake.run(...)
 end
 
 function cmake.debug(...)
-  if not utils.ensure_no_job_active() or not utils.ensure_in_cmake_project() then
+  if not utils.ensure_no_job_active() then
     return
   end
 
