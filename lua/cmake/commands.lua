@@ -32,7 +32,7 @@ function commands.run_command(command)
     utils.notify('No such command: ' .. command.fargs[1], vim.log.levels.ERROR)
     return
   end
-  command_func(vim.list_slice(command.fargs, 2, #command.fargs))
+  command_func(vim.list_slice(command.fargs, 2))
 end
 
 return commands
