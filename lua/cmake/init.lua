@@ -76,7 +76,7 @@ function cmake.run(args)
 
   local project_config = ProjectConfig.new()
   local target_dir, target, project_args = project_config:get_current_target()
-  if not target then
+  if not target_dir or not target then
     return
   end
 
@@ -95,7 +95,7 @@ function cmake.debug(args)
   end
 
   local target_dir, target, project_args = project_config:get_current_target()
-  if not target then
+  if not target_dir or not target then
     return
   end
 
