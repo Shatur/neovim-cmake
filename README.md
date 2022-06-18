@@ -64,7 +64,7 @@ require('cmake').setup({
     only_on_error = false, -- Open quickfix window only if target build failed.
   },
   copy_compile_commands = true, -- Copy compile_commands.json to current working directory.
-  dap_configuration = { type = 'cpp', request = 'launch' }, -- DAP configuration. By default configured to work with `lldb-vscode`.
+  dap_configuration = { type = 'lldb', request = 'launch' }, -- DAP configuration. By default configured to work with `lldb-vscode`.
   dap_open_command = require('dap').repl.open, -- Command to run after starting DAP session. You can set it to `false` if you don't want to open anything or `require('dapui').open` if you are using https://github.com/rcarriga/nvim-dap-ui
 })
 ```
@@ -80,7 +80,7 @@ The mentioned `parameters_file` will be created for every project with the follo
 }
 ```
 
-Usually you don't need to edit it manually, you can set its values using the `:CMake <command>` commands.
+Usually you don't need to edit it manually, you can set its values using the `:CMake <subcommand>` commands.
 
 ### CodeLLDB DAP configuration example
 
@@ -113,19 +113,21 @@ require('cmake').setup({
 })
 ```
 
-Additionally all cmake module functions that runs something return `Plenary.job`, so one can also set `on_exit` callbacks:
+Additionally all `cmake` module functions that runs something return `Plenary.job`, so one can also set callbacks:
 
 ```lua
 function cmake_build()
   local job = require('cmake').build()
-  job:after(vim.schedule_wrap(
-    function(_, exit_code)
-      if exit_code == 0 then
-        vim.notify("Target was built successfully", vim.log.levels.INFO, { title = 'CMake' })
-      else
-        vim.notify("Target build failed", vim.log.levels.ERROR, { title = 'CMake' })
+  if job then
+    job:after(vim.schedule_wrap(
+      function(_, exit_code)
+        if exit_code == 0 then
+          vim.notify("Target was built successfully", vim.log.levels.INFO, { title = 'CMake' })
+        else
+          vim.notify("Target build failed", vim.log.levels.ERROR, { title = 'CMake' })
+        end
       end
-    end
-  ))
+    ))
+  end
 end
 ```
