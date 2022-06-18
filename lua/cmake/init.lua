@@ -11,46 +11,49 @@ function cmake.setup(values)
   setmetatable(config, { __index = vim.tbl_deep_extend('force', config.defaults, values) })
 end
 
-function cmake.configure(args)
+function cmake.configure(additional_args)
   local project_config = ProjectConfig.new()
   project_config:get_build_dir():mkdir({ parents = true })
   if not project_config:make_query_files() then
     return
   end
 
-  args = vim.list_extend({ '-B', project_config:get_build_dir().filename, '-D', 'CMAKE_BUILD_TYPE=' .. project_config.json.build_type, unpack(config.configure_args) }, args or {})
+  local args = vim.list_extend({ '-B', project_config:get_build_dir().filename, '-D', 'CMAKE_BUILD_TYPE=' .. project_config.json.build_type }, config.configure_args)
+  vim.list_extend(args, additional_args or {})
   return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
-function cmake.build(args)
+function cmake.build(additional_args)
   local project_config = ProjectConfig.new()
   if not project_config.json.current_target then
     utils.notify('You need to select target first', vim.log.levels.ERROR)
     return
   end
 
-  args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', project_config.json.current_target, unpack(config.build_args) }, args or {})
+  local args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', project_config.json.current_target }, config.build_args)
+  vim.list_extend(args, additional_args or {})
   return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
-function cmake.build_all(args)
+function cmake.build_all(additional_args)
   local project_config = ProjectConfig.new()
-  args = vim.list_extend({ '--build', project_config:get_build_dir().filename, unpack(config.build_args) }, args or {})
+  local args = vim.list_extend({ '--build', project_config:get_build_dir().filename }, config.build_args)
+  vim.list_extend(args, additional_args or {})
   return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
-function cmake.run(args)
+function cmake.run(additional_args)
   local project_config = ProjectConfig.new()
-  local target_dir, target, project_args = project_config:get_current_target()
+  local target_dir, target, target_args = project_config:get_current_target()
   if not target_dir or not target then
     return
   end
 
-  args = vim.list_extend(project_args, args or {})
-  return utils.run(target.filename, args, { cwd = target_dir.filename, force_quickfix = true })
+  vim.list_extend(target_args, additional_args or {})
+  return utils.run(target.filename, target_args, { cwd = target_dir.filename, force_quickfix = true })
 end
 
-function cmake.debug(args)
+function cmake.debug(additional_args)
   if not utils.ensure_no_job_active() or not utils.ensure_in_cmake_project() then
     return
   end
@@ -60,18 +63,18 @@ function cmake.debug(args)
     return
   end
 
-  local target_dir, target, project_args = project_config:get_current_target()
+  local target_dir, target, target_args = project_config:get_current_target()
   if not target_dir or not target then
     return
   end
 
-  args = vim.list_extend(project_args, args or {})
+  vim.list_extend(target_args, additional_args or {})
 
   vim.api.nvim_command('cclose')
   local dap_config = {
     name = project_config.json.current_target,
     program = target.filename,
-    args = args,
+    args = target_args,
     cwd = target_dir.filename,
   }
   dap.run(vim.tbl_extend('force', dap_config, config.dap_configuration))
@@ -80,18 +83,18 @@ function cmake.debug(args)
   end
 end
 
-function cmake.clean(args)
+function cmake.clean(additional_args)
   local project_config = ProjectConfig.new()
-  args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', 'clean' }, args or {})
+  local args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', 'clean' }, additional_args or {})
   return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
-function cmake.build_and_run(args)
+function cmake.build_and_run(additional_args)
   if not ProjectConfig.new():get_current_executable_info() then
     return
   end
 
-  local job = cmake.build(args)
+  local job = cmake.build(additional_args)
   if job then
     job:after_success(function()
       vim.schedule(cmake.run)
@@ -100,13 +103,13 @@ function cmake.build_and_run(args)
   return job
 end
 
-function cmake.build_and_debug(args)
+function cmake.build_and_debug(additional_args)
   local project_config = ProjectConfig.new()
   if not project_config:get_current_executable_info() or not project_config:validate_for_debugging() then
     return
   end
 
-  local job = cmake.build(args)
+  local job = cmake.build(additional_args)
   if job then
     job:after_success(function()
       vim.schedule(cmake.debug)
