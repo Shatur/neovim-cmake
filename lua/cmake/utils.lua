@@ -48,6 +48,10 @@ function utils.copy_compile_commands(source_folder)
 end
 
 function utils.run(cmd, args, opts)
+  if not utils.ensure_no_job_active() then
+    return nil
+  end
+
   vim.fn.setqflist({}, ' ', { title = cmd .. ' ' .. table.concat(args, ' ') })
   opts.force_quickfix = vim.F.if_nil(opts.force_quickfix, not config.quickfix.only_on_error)
   if opts.force_quickfix then
