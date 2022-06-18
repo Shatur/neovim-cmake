@@ -48,7 +48,7 @@ function utils.copy_compile_commands(source_folder)
 end
 
 function utils.run(cmd, args, opts)
-  if not utils.ensure_no_job_active() or not utils.ensure_in_cmake_project() then
+  if not utils.ensure_no_job_active() then
     return nil
   end
 
@@ -79,15 +79,6 @@ function utils.run(cmd, args, opts)
 
   utils.last_job:start()
   return utils.last_job
-end
-
-function utils.ensure_in_cmake_project()
-  local cmake_lists = Path:new('CMakeLists.txt')
-  if cmake_lists:is_file() then
-    return true
-  end
-  utils.notify('Unable to find ' .. cmake_lists.filename, vim.log.levels.ERROR)
-  return false
 end
 
 function utils.ensure_no_job_active()
