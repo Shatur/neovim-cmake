@@ -32,7 +32,12 @@ function commands.run_command(command)
     utils.notify('No such command: ' .. command.fargs[1], vim.log.levels.ERROR)
     return
   end
-  command_func(vim.list_slice(command.fargs, 2))
+  local command_info = debug.getinfo(command_func)
+  if not command_info.isvararg and #command.fargs - 1 > command_info.nparams then
+    utils.notify('Command: ' .. command.fargs[1] .. ' should have ' .. command_info.nparams .. ' arguments', vim.log.levels.ERROR)
+    return
+  end
+  command_func(table.unpack(command.fargs, 2))
 end
 
 return commands
