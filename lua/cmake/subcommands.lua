@@ -33,8 +33,11 @@ function subcommands.run(subcommand)
     return
   end
   local subcommand_info = debug.getinfo(subcommand_func)
-  if not subcommand_info.isvararg and #subcommand.fargs - 1 > subcommand_info.nparams then
-    utils.notify('Subcommand: ' .. subcommand.fargs[1] .. ' should have ' .. subcommand_info.nparams .. ' arguments', vim.log.levels.ERROR)
+  if subcommand_info.isvararg and #subcommand.fargs - 1 < subcommand_info.nparams then
+    utils.notify('Subcommand: ' .. subcommand.fargs[1] .. ' should have at least ' .. subcommand_info.nparams .. ' argument(s)', vim.log.levels.ERROR)
+    return
+  elseif not subcommand_info.isvararg and #subcommand.fargs - 1 ~= subcommand_info.nparams then
+    utils.notify('Subcommand: ' .. subcommand.fargs[1] .. ' should have ' .. subcommand_info.nparams .. ' argument(s)', vim.log.levels.ERROR)
     return
   end
   subcommand_func(table.unpack(subcommand.fargs, 2))
