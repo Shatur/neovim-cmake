@@ -2,7 +2,7 @@ local cmake = require('cmake')
 local utils = require('cmake.utils')
 local subcommands = {}
 
-function subcommands.match(arg, cmd_line)
+function subcommands.complete(arg, cmd_line)
   local matches = {}
 
   local words = vim.split(cmd_line, ' ', { trimempty = true })

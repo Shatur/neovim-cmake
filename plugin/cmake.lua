@@ -5,4 +5,4 @@ end
 
 local subcommands = require('cmake.subcommands')
 
-vim.api.nvim_create_user_command('CMake', subcommands.run, { nargs = '*', complete = subcommands.match, desc = 'Run CMake command' })
+vim.api.nvim_create_user_command('CMake', subcommands.run, { nargs = '*', complete = subcommands.complete, desc = 'Run CMake command' })
