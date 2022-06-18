@@ -17,7 +17,7 @@ local config = {
       only_on_error = false,
     },
     copy_compile_commands = true,
-    dap_configuration = { type = 'cpp', request = 'launch' },
+    dap_configuration = { type = 'lldb', request = 'launch' },
     dap_open_command = require('dap').repl.open,
   },
 }
