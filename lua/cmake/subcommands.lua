@@ -40,7 +40,7 @@ function subcommands.run(subcommand)
     utils.notify('Subcommand: ' .. subcommand.fargs[1] .. ' should have ' .. subcommand_info.nparams .. ' argument(s)', vim.log.levels.ERROR)
     return
   end
-  subcommand_func(table.unpack(subcommand.fargs, 2))
+  subcommand_func(unpack(subcommand.fargs, 2))
 end
 
 return subcommands

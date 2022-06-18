@@ -19,7 +19,7 @@ function cmake.configure(...)
   end
 
   local args = vim.list_extend({ '-B', project_config:get_build_dir().filename, '-D', 'CMAKE_BUILD_TYPE=' .. project_config.json.build_type }, config.configure_args)
-  vim.list_extend(args, table.pack(...))
+  vim.list_extend(args, {...})
   return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
@@ -31,14 +31,14 @@ function cmake.build(...)
   end
 
   local args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', project_config.json.current_target }, config.build_args)
-  vim.list_extend(args, table.pack(...))
+  vim.list_extend(args, {...})
   return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
 function cmake.build_all(...)
   local project_config = ProjectConfig.new()
   local args = vim.list_extend({ '--build', project_config:get_build_dir().filename }, config.build_args)
-  vim.list_extend(args, table.pack(...))
+  vim.list_extend(args, {...})
   return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
@@ -49,7 +49,7 @@ function cmake.run(...)
     return
   end
 
-  vim.list_extend(target_args, table.pack(...))
+  vim.list_extend(target_args, {...})
   return utils.run(target.filename, target_args, { cwd = target_dir.filename, force_quickfix = true })
 end
 
@@ -68,7 +68,7 @@ function cmake.debug(...)
     return
   end
 
-  vim.list_extend(target_args, table.pack(...))
+  vim.list_extend(target_args, {...})
 
   local dap_config = {
     name = project_config.json.current_target,
@@ -85,7 +85,7 @@ end
 
 function cmake.clean(...)
   local project_config = ProjectConfig.new()
-  local args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', 'clean' }, table.pack(...))
+  local args = vim.list_extend({ '--build', project_config:get_build_dir().filename, '--target', 'clean' }, {...})
   return utils.run(config.cmake_executable, args, { copy_compile_commands_from = project_config:get_build_dir() })
 end
 
