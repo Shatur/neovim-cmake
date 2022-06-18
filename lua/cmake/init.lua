@@ -70,7 +70,6 @@ function cmake.debug(...)
 
   vim.list_extend(target_args, table.pack(...))
 
-  vim.api.nvim_command('cclose')
   local dap_config = {
     name = project_config.json.current_target,
     program = target.filename,
@@ -78,6 +77,7 @@ function cmake.debug(...)
     cwd = target_dir.filename,
   }
   dap.run(vim.tbl_extend('force', dap_config, config.dap_configuration))
+  vim.api.nvim_command('cclose')
   if config.dap_open_command then
     config.dap_open_command()
   end
