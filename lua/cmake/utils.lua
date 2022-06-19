@@ -53,7 +53,6 @@ local function read_to_quickfix()
             --    This is generally only false when we do end with a new line.
             --    It prevents putting in a "" to the end of the results.
           elseif start ~= processed_index or found_newline then
-            -- results[result_index] = line
             result_line = line
 
             -- Otherwise, we don't need to do anything.
