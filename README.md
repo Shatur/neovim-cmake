@@ -57,7 +57,7 @@ require('cmake').setup({
   default_projects_path = tostring(Path:new(vim.loop.os_homedir(), 'Projects')), -- Default folder for creating project.
   configure_args = { '-D', 'CMAKE_EXPORT_COMPILE_COMMANDS=1' }, -- Default arguments that will be always passed at cmake configure step. By default tells cmake to generate `compile_commands.json`.
   build_args = {}, -- Default arguments that will be always passed at cmake build step.
-  on_build_output = nil, -- Callback which will be called on every line that is printed during build process. Accepts printed line as argument.
+  on_build_output = nil, -- Callback that will be called each time data is received by the current process. Accepts the received data as an argument.
   quickfix = {
     pos = 'botright', -- Where to open quickfix
     height = 10, -- Height of the opened quickfix.
@@ -104,8 +104,9 @@ require('cmake').setup({
   quickfix = {
     only_on_error = true,
   },
-  on_build_output = function(line)
-    local match = string.match(line, "(%[.*%])")
+  on_build_output = function(lines)
+    -- Get only last line
+    local match = string.match(lines[#lines], "(%[.*%])")
     if match then
       progress = string.gsub(match, "%%", "%%%%")
     end
