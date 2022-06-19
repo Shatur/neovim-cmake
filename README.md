@@ -32,7 +32,7 @@ Use the command `:CMake` with one of the following arguments:
 
 If no arguments are specified, then `configure` will be executed.
 
-Also the corresponding Lua functions with the same names as the arguments are available from [require('cmake')](lua/cmake/init.lua).
+Also the corresponding Lua functions with the same names as the arguments are available from [`require('cmake')`](lua/cmake/init.lua).
 
 Commands `select_build_type`, `select_target` and `create_project` use `vim.ui.select()`. To use your favorite picker like Telescope, consider installing [dressing.nvim](https://github.com/stevearc/dressing.nvim) or [telescope-ui-select.nvim](https://github.com/nvim-telescope/telescope-ui-select.nvim).
 
