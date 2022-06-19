@@ -4,6 +4,13 @@ local config = require('cmake.config')
 local scandir = require('plenary.scandir')
 local utils = {}
 
+local function copy_compile_commands(source_folder)
+  local filename = 'compile_commands.json'
+  local source = source_folder / filename
+  local destination = Path:new(vim.loop.cwd(), filename)
+  source:copy({ destination = destination.filename })
+end
+
 local function append_to_quickfix(lines)
   vim.fn.setqflist({}, 'a', { lines = lines })
   -- Scrolls the quickfix buffer if not active
@@ -114,13 +121,6 @@ function utils.copy_folder(folder, destination)
   end
 end
 
-function utils.copy_compile_commands(source_folder)
-  local filename = 'compile_commands.json'
-  local source = source_folder / filename
-  local destination = Path:new(vim.loop.cwd(), filename)
-  source:copy({ destination = destination.filename })
-end
-
 function utils.run(cmd, args, opts)
   if not utils.ensure_no_job_active() then
     return nil
@@ -140,7 +140,7 @@ function utils.run(cmd, args, opts)
       append_to_quickfix({ 'Exited with code ' .. (signal == 0 and code or 128 + signal) })
       if code == 0 and signal == 0 then
         if config.copy_compile_commands and opts.copy_compile_commands_from then
-          utils.copy_compile_commands(opts.copy_compile_commands_from)
+          copy_compile_commands(opts.copy_compile_commands_from)
         end
       elseif not opts.force_quickfix then
         show_quickfix()
