@@ -38,10 +38,11 @@ Commands `select_build_type`, `select_target` and `create_project` use `vim.ui.s
 
 ## Simple usage example
 
-1. Create a new project (`:CMake create_project`) or open an existing.
-2. Configure project (`:CMake configure`) to create build folder and get targets information
+1. Create a new project (`:CMake create_project`) or open folder with an existing.
+2. Configure project (`:CMake configure`, you can pass any additional CMake arguments) to create build folder and get targets information.
 3. Select target to execute (`:CMake select_target`).
-4. Build and run (`:CMake build_and_run`)
+4. Set target arguments (`:CMake set_target_arguments`, they will be added automatically for running and debugging).
+5. Build and run (`:CMake build_and_run`) or build and debug (`:CMake build_and_debug`) to execute the selected target (you can pass additional arguments to these commands, which will be temporarily added to the arguments from 4).
 
 ## Configuration
 
