@@ -114,6 +114,46 @@ function utils.notify(msg, log_level)
   vim.notify(msg, log_level, { title = 'CMake' })
 end
 
+function utils.split_args(args)
+  if not args then
+    return {}
+  end
+
+  -- Handle table for compatibility with the previous version
+  if type(args) == 'table' then
+    return args
+  end
+
+  -- Split on spaces unless "in quotes"
+  local splitted_args = vim.fn.split(args, [[\s\%(\%([^'"]*\(['"]\)[^'"]*\1\)*[^'"]*$\)\@=]])
+
+  -- Remove quotes
+  for i, arg in ipairs(splitted_args) do
+    splitted_args[i] = arg:gsub('"', ''):gsub("'", '')
+  end
+  return splitted_args
+end
+
+function utils.join_args(args)
+  if not args then
+    return ''
+  end
+
+  -- Handle strings for compatibility with the previous version
+  if type(args) == 'string' then
+    return args
+  end
+
+  -- Add quotes if argument contain spaces
+  for index, arg in ipairs(args) do
+    if arg:find(' ') then
+      args[index] = '"' .. arg .. '"'
+    end
+  end
+
+  return table.concat(args, ' ')
+end
+
 function utils.copy_folder(folder, destination)
   destination:mkdir()
   for _, entry in ipairs(scandir.scan_dir(folder.filename, { depth = 1, add_dirs = true })) do

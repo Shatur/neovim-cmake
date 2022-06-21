@@ -11,21 +11,6 @@ local json_defaults = {
   build_type = 'Debug',
 }
 
-local function split_args(args)
-  if not args then
-    return {}
-  end
-
-  -- Split on spaces unless "in quotes"
-  local splitted_args = vim.fn.split(args, [[\s\%(\%([^'"]*\(['"]\)[^'"]*\1\)*[^'"]*$\)\@=]])
-
-  -- Remove quotes
-  for i, arg in ipairs(splitted_args) do
-    splitted_args[i] = arg:gsub('"', ''):gsub("'", '')
-  end
-  return splitted_args
-end
-
 function ProjectConfig.new()
   local project_config = {}
   local parameters_file = Path:new(config.parameters_file)
@@ -148,7 +133,7 @@ function ProjectConfig:get_current_target()
   if target_dir == nil then
     target_dir = target:parent()
   end
-  local target_args = split_args(self.json.args[target_info['name']]) or {}
+  local target_args = utils.split_args(self.json.args[target_info['name']]) -- Try to split args for compatibility with the previous version
   return target_dir, target, target_args
 end
 
