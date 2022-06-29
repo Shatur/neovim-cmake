@@ -11,14 +11,6 @@ local function copy_compile_commands(source_folder)
   source:copy({ destination = destination.filename })
 end
 
-local function save_all_buffers()
-  for _, buffer in ipairs(vim.api.nvim_list_bufs()) do
-    if #vim.api.nvim_buf_get_name(buffer) ~= 0 and vim.api.nvim_buf_get_option(buffer, 'modified') then
-      vim.api.nvim_command('silent write')
-    end
-  end
-end
-
 local function append_to_quickfix(lines)
   vim.fn.setqflist({}, 'a', { lines = lines })
   -- Scrolls the quickfix buffer if not active
@@ -175,7 +167,7 @@ function utils.run(cmd, args, opts)
   end
 
   if config.save_before_build and cmd == config.cmake_executable then
-    save_all_buffers()
+    vim.api.nvim_command('silent! wall')
   end
 
   vim.fn.setqflist({}, ' ', { title = cmd .. ' ' .. table.concat(args, ' ') })
