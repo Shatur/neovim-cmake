@@ -66,9 +66,7 @@ function ProjectConfig:get_codemodel_targets()
   return codemodel_json['configurations'][1]['targets']
 end
 
-function ProjectConfig:get_target_info(codemodel_target)
-  return vim.json.decode((self:get_reply_dir() / codemodel_target['jsonFile']):read())
-end
+function ProjectConfig:get_target_info(codemodel_target) return vim.json.decode((self:get_reply_dir() / codemodel_target['jsonFile']):read()) end
 
 -- Tell CMake to generate codemodel
 function ProjectConfig:make_query_files()

@@ -7,9 +7,7 @@ local Job = require('plenary.job')
 local ProjectConfig = require('cmake.project_config')
 local cmake = {}
 
-function cmake.setup(values)
-  setmetatable(config, { __index = vim.tbl_deep_extend('force', config.defaults, values) })
-end
+function cmake.setup(values) setmetatable(config, { __index = vim.tbl_deep_extend('force', config.defaults, values) }) end
 
 function cmake.configure(...)
   local project_config = ProjectConfig.new()
@@ -96,9 +94,7 @@ function cmake.build_and_run(...)
 
   local job = cmake.build(...)
   if job then
-    job:after_success(function()
-      vim.schedule(cmake.run)
-    end)
+    job:after_success(function() vim.schedule(cmake.run) end)
   end
   return job
 end
@@ -111,9 +107,7 @@ function cmake.build_and_debug(...)
 
   local job = cmake.build(...)
   if job then
-    job:after_success(function()
-      vim.schedule(cmake.debug)
-    end)
+    job:after_success(function() vim.schedule(cmake.debug) end)
   end
   return job
 end
