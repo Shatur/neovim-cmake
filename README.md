@@ -54,7 +54,7 @@ require('cmake').setup({
   cmake_executable = 'cmake', -- CMake executable to run.
   save_before_build = true, -- Save all buffers before building.
   parameters_file = 'neovim.json', -- JSON file to store information about selected target, run arguments and build type.
-  default_parameters = { run_dir = '', args = {}, build_type = '' }, -- The default values in `parameters_file`.
+  default_parameters = { run_dir = '', args = {}, build_type = 'Debug' }, -- The default values in `parameters_file`.
   build_dir = tostring(Path:new('{cwd}', 'build', '{os}-{build_type}')), -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values. Could be a function that return the path to the build directory.
   samples_path = tostring(script_path:parent():parent():parent() / 'samples'), -- Folder with samples. `samples` folder from the plugin directory is used by default.
   default_projects_path = tostring(Path:new(vim.loop.os_homedir(), 'Projects')), -- Default folder for creating project.
@@ -78,7 +78,7 @@ The mentioned `parameters_file` will be created for every project with `default_
 {
   "args": {}, // A dictionary with target names and their arguments specified as an array.
   "current_target": "", // Current target name.
-  "build_type": "", // Current build type, can be Debug, Release, RelWithDebInfo or MinSizeRel.
+  "build_type": "Debug", // Current build type, can be Debug, Release, RelWithDebInfo or MinSizeRel.
   "run_dir": "" // Default working directory for targets. By default is missing, the current target directory will be used
 }
 ```
