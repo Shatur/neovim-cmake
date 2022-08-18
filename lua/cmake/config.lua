@@ -6,7 +6,7 @@ local config = {
     cmake_executable = 'cmake',
     save_before_build = true,
     parameters_file = 'neovim.json',
-    default_parameters = { run_dir = '', args = {}, build_type = '' },
+    default_parameters = { run_dir = '', args = {}, build_type = 'Debug' },
     build_dir = tostring(Path:new('{cwd}', 'build', '{os}-{build_type}')),
     samples_path = tostring(script_path:parent():parent():parent() / 'samples'),
     default_projects_path = tostring(Path:new(vim.loop.os_homedir(), 'Projects')),
