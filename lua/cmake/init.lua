@@ -164,7 +164,7 @@ function cmake.select_build_type()
   end)
 end
 
-function cmake.select_target(callback, ...)
+function cmake.select_target(cb, ...)
   local project_config = ProjectConfig.new()
   if not project_config:get_build_dir():is_dir() then
     utils.notify('You need to configure first', vim.log.levels.ERROR)
@@ -195,8 +195,11 @@ function cmake.select_target(callback, ...)
     end
     project_config.json.current_target = targets[idx]
     project_config:write()
-    if callback ~= nil and type(callback) == 'function' then
-        callback(args)
+    if cb ~= nil then
+        local t = type(cb)
+        if t == 'function' or (t == 'table' and type(getmetatable(cb).__call) == 'function') then
+            cb(args)
+        end
     end
   end)
 end
