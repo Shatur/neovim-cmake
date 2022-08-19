@@ -196,10 +196,10 @@ function cmake.select_target(cb, ...)
     project_config.json.current_target = targets[idx]
     project_config:write()
     if cb ~= nil then
-        local t = type(cb)
-        if t == 'function' or (t == 'table' and type(getmetatable(cb).__call) == 'function') then
-            cb(args)
-        end
+      local t = type(cb)
+      if t == 'function' or (t == 'table' and type(getmetatable(cb).__call) == 'function') then
+        cb(args)
+      end
     end
   end)
 end
