@@ -180,7 +180,7 @@ function cmake.select_dap_config()
   local dap_configs = vim.tbl_keys(config.dap_configurations)
   table.insert(dap_configs, 'Use default')
 
-  vim.ui.select(dap_configs, { prompt = 'Select DAP Configuration' }, function (choice, idx)
+  vim.ui.select(dap_configs, { prompt = 'Select DAP Configuration' }, function(choice, idx)
     if not idx then
       return
     end
