@@ -84,11 +84,10 @@ The mentioned `parameters_file` will be created for every project using `default
   "args": {"target_name": ["arg1", "arg2"]}, // A dictionary with target names and their arguments specified as an array.
   "current_target": "target_name", // Current target name.
   "build_type": "Debug", // Current build type, can be Debug, Release, RelWithDebInfo or MinSizeRel.
-  "run_dir": "build/my_folder" // Default working directory for targets. Can be absolute or relative to the current Neovim working directory. By default is missing, in this case current target directory will be used.
+  "run_dir": "build/my_folder", // Default working directory for targets. Can be absolute or relative to the current Neovim working directory. By default is missing, in this case current target directory will be used.
+  "dap_configuration": "cppdbg_vscode" // A string specifying a specific dap configuration to use for this project. If absent then the `dap_configuration` from `require('cmake').setup` will be used, which is the default behaviour.
 }
 ```
-
-Project specific DAP configuration (ex. `"dap_configuration": "cppdbg"`) will also be contained here but is left out if the project uses the global default.
 
 Usually you don't need to edit it manually, you can set its values using the `:CMake <subcommand>` commands.
 
