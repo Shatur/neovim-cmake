@@ -54,7 +54,7 @@ require('cmake').setup({
   cmake_executable = 'cmake', -- CMake executable to run.
   save_before_build = true, -- Save all buffers before building.
   parameters_file = 'neovim.json', -- JSON file to store information about selected target, run arguments and build type.
-  default_parameters = { run_dir = '', args = {}, build_type = 'Debug' }, -- The default values in `parameters_file`.
+  default_parameters = { args = {}, build_type = 'Debug' }, -- The default values in `parameters_file`. Can also optionally contain `run_dir` with the working directory for applications.
   build_dir = tostring(Path:new('{cwd}', 'build', '{os}-{build_type}')), -- Build directory. The expressions `{cwd}`, `{os}` and `{build_type}` will be expanded with the corresponding text values. Could be a function that return the path to the build directory.
   samples_path = tostring(script_path:parent():parent():parent() / 'samples'), -- Folder with samples. `samples` folder from the plugin directory is used by default.
   default_projects_path = tostring(Path:new(vim.loop.os_homedir(), 'Projects')), -- Default folder for creating project.
@@ -72,14 +72,14 @@ require('cmake').setup({
 })
 ```
 
-The mentioned `parameters_file` will be created for every project with `default_parameters`:
+The mentioned `parameters_file` will be created for every project using `default_parameters` as defaults:
 
 ```jsonc
 {
-  "args": {}, // A dictionary with target names and their arguments specified as an array.
-  "current_target": "", // Current target name.
+  "args": {"target_name": ["arg1", "arg2"]}, // A dictionary with target names and their arguments specified as an array.
+  "current_target": "target_name", // Current target name.
   "build_type": "Debug", // Current build type, can be Debug, Release, RelWithDebInfo or MinSizeRel.
-  "run_dir": "" // Default working directory for targets. By default is missing, the current target directory will be used
+  "run_dir": "build/my_folder" // Default working directory for targets. Can be absolute or relative to the current Neovim working directory. By default is missing, in this case current target directory will be used.
 }
 ```
 
