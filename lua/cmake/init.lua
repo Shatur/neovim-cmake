@@ -179,18 +179,14 @@ end
 
 function cmake.select_dap_config()
   local project_config = ProjectConfig.new()
-  local dap_configs = {}
-  local n = 1
-  for k, _ in pairs(config.dap_configurations) do
-    dap_configs[n] = k
-    n = n + 1
-  end
-  dap_configs[n] = "Use default"
+  local dap_configs = vim.tbl_keys(config.dap_configurations)
+  table.insert(dap_configs, "Use default")
+
   vim.ui.select(dap_configs, { prompt = "Select DAP Configuration" }, function (choice, idx)
     if not idx then
       return
     end
-    project_config.json.dap_configuration = idx ~= n and choice or nil
+    project_config.json.dap_configuration = idx ~= #dap_configs and choice or nil
     project_config:write()
   end)
 end
