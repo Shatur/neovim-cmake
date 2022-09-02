@@ -164,7 +164,7 @@ function cmake.select_build_type()
   end)
 end
 
-function cmake.select_target()
+function cmake.select_target(cb, ...)
   local project_config = ProjectConfig.new()
   if not project_config:get_build_dir():is_dir() then
     utils.notify('You need to configure first', vim.log.levels.ERROR)
@@ -188,12 +188,19 @@ function cmake.select_target()
     end
   end
 
+  local args = ...
   vim.ui.select(display_targets, { prompt = 'Select target' }, function(_, idx)
     if not idx then
       return
     end
     project_config.json.current_target = targets[idx]
     project_config:write()
+    if cb ~= nil then
+      local t = type(cb)
+      if t == 'function' or (t == 'table' and type(getmetatable(cb).__call) == 'function') then
+        cb(args)
+      end
+    end
   end)
 end
 
