@@ -64,9 +64,7 @@ function cmake.debug(...)
   local dap_config = project_config.json.dap_configuration or config.dap_configuration
   if type(dap_config) == 'string' then
     if not config.dap_configurations[dap_config] then
-      utils.notify(
-        string.format("`%s` not found in cmakes `dap_configurations` settings", dap_config),
-        vim.log.levels.ERROR)
+      utils.notify(string.format('`%s` not found in cmakes `dap_configurations` settings', dap_config), vim.log.levels.ERROR)
       return
     end
 
@@ -180,9 +178,9 @@ end
 function cmake.select_dap_config()
   local project_config = ProjectConfig.new()
   local dap_configs = vim.tbl_keys(config.dap_configurations)
-  table.insert(dap_configs, "Use default")
+  table.insert(dap_configs, 'Use default')
 
-  vim.ui.select(dap_configs, { prompt = "Select DAP Configuration" }, function (choice, idx)
+  vim.ui.select(dap_configs, { prompt = 'Select DAP Configuration' }, function (choice, idx)
     if not idx then
       return
     end
