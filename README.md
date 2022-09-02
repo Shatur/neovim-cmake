@@ -26,6 +26,7 @@ Use the command `:CMake` with one of the following arguments:
 | `clear_cache`          | Remove `CMakeCache.txt` file from the build directory.                                                                                                                                                                                      |
 | `open_build_dir`       | Open current build folder via `xdg-open` (Linux) or `start` (Windows).                                                                                                                                                                      |
 | `select_build_type`    | Select build type (Release, Debug, etc.).                                                                                                                                                                                                   |
+| `select_dap_config`    | Select a project sepecific DAP configuration. You can configure the options in `require('cmake').setup({ dap_configurations = { ... } })`                                                                                                   |
 | `select_target`        | Select target for running / debugging.                                                                                                                                                                                                      |
 | `create_project`       | Create new CMake project.                                                                                                                                                                                                                   |
 | `cancel`               | Cancel current running CMake action like `build` or `run`.                                                                                                                                                                                  |
@@ -67,7 +68,11 @@ require('cmake').setup({
     only_on_error = false, -- Open quickfix window only if target build failed.
   },
   copy_compile_commands = true, -- Copy compile_commands.json to current working directory.
-  dap_configuration = { type = 'lldb', request = 'launch' }, -- DAP configuration. By default configured to work with `lldb-vscode`.
+  dap_configurations = { -- Table of different DAP configurations.
+    lldb_vscode = { type = 'lldb', request = 'launch' },
+    cppdbg_vscode = { type = 'cppdbg', request = 'launch' },
+  },
+  dap_configuration = 'lldb_vscode', -- DAP configuration to use if the projects `parameters_file` does not specify one.
   dap_open_command = require('dap').repl.open, -- Command to run after starting DAP session. You can set it to `false` if you don't want to open anything or `require('dapui').open` if you are using https://github.com/rcarriga/nvim-dap-ui
 })
 ```
@@ -82,6 +87,8 @@ The mentioned `parameters_file` will be created for every project with `default_
   "run_dir": "" // Default working directory for targets. By default is missing, the current target directory will be used
 }
 ```
+
+Project specific DAP configuration (ex. `"dap_configuration": "cppdbg"`) will also be contained here but is left out if the project uses the global default.
 
 Usually you don't need to edit it manually, you can set its values using the `:CMake <subcommand>` commands.
 

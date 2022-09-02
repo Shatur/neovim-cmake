@@ -61,6 +61,18 @@ function cmake.debug(...)
     return
   end
 
+  local dap_config = project_config.json.dap_configuration or config.dap_configuration
+  if type(dap_config) == 'string' then
+    if not config.dap_configurations[dap_config] then
+      utils.notify(
+        string.format("`%s` not found in cmakes `dap_configurations` settings", dap_config),
+        vim.log.levels.ERROR)
+      return
+    end
+
+    dap_config = config.dap_configurations[dap_config]
+  end
+
   local target_dir, target, target_args = project_config:get_current_target()
   if not target_dir or not target then
     return
@@ -68,13 +80,14 @@ function cmake.debug(...)
 
   vim.list_extend(target_args, { ... })
 
-  local dap_config = {
+  local base_dap_config = {
     name = project_config.json.current_target,
     program = target.filename,
     args = target_args,
     cwd = target_dir.filename,
   }
-  dap.run(vim.tbl_extend('force', dap_config, config.dap_configuration))
+
+  dap.run(vim.tbl_extend('force', base_dap_config, dap_config))
   vim.api.nvim_command('cclose')
   if config.dap_open_command then
     config.dap_open_command()
@@ -160,6 +173,24 @@ function cmake.select_build_type()
       return
     end
     project_config.json.build_type = build_type
+    project_config:write()
+  end)
+end
+
+function cmake.select_dap_config()
+  local project_config = ProjectConfig.new()
+  local dap_configs = {}
+  local n = 1
+  for k, _ in pairs(config.dap_configurations) do
+    dap_configs[n] = k
+    n = n + 1
+  end
+  dap_configs[n] = "Use default"
+  vim.ui.select(dap_configs, { prompt = "Select DAP Configuration" }, function (choice, idx)
+    if not idx then
+      return
+    end
+    project_config.json.dap_configuration = idx ~= n and choice or nil
     project_config:write()
   end)
 end

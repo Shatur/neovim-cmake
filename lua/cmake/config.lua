@@ -19,7 +19,11 @@ local config = {
       only_on_error = false,
     },
     copy_compile_commands = true,
-    dap_configuration = { type = 'lldb', request = 'launch' },
+    dap_configurations = {
+      lldb_vscode = { type = 'lldb', request = 'launch' },
+      cppdbg_vscode = { type = 'cppdbg', request = 'launch', cwd = '${workspaceFolder}' },
+    },
+    dap_configuration = 'lldb_vscode',
     dap_open_command = require('dap').repl.open,
   },
 }
