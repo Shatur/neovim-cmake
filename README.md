@@ -1,12 +1,14 @@
 # Neovim CMake
 
-A Neovim 0.7+ plugin that use [cmake-file-api](https://cmake.org/cmake/help/latest/manual/cmake-file-api.7.html#codemodel-version-2) to provide integration with building, running and debugging projects with output to quickfix.
+A Neovim 0.7+ plugin that uses [cmake-file-api](https://cmake.org/cmake/help/latest/manual/cmake-file-api.7.html#codemodel-version-2) to provide integration with building, running and debugging projects with output to quickfix.
 
 ## Dependencies
 
-- [cmake](https://cmake.org) for building and reading project information.
-- [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for internal helpers.
-- [nvim-dap](https://github.com/mfussenegger/nvim-dap) for debugging.
+- Necessary
+  - [cmake](https://cmake.org) for building and reading project information.
+  - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for internal helpers.
+- Optional
+  - [nvim-dap](https://github.com/mfussenegger/nvim-dap) - for debugging.
 
 ## Commands
 
@@ -73,7 +75,7 @@ require('cmake').setup({
     cppdbg_vscode = { type = 'cppdbg', request = 'launch' },
   },
   dap_configuration = 'lldb_vscode', -- DAP configuration to use if the projects `parameters_file` does not specify one.
-  dap_open_command = require('dap').repl.open, -- Command to run after starting DAP session. You can set it to `false` if you don't want to open anything or `require('dapui').open` if you are using https://github.com/rcarriga/nvim-dap-ui
+  dap_open_command = function(...) require('dap').repl.open(...) end, -- Command to run after starting DAP session. You can set it to `false` if you don't want to open anything or `require('dapui').open` if you are using https://github.com/rcarriga/nvim-dap-ui
 })
 ```
 
