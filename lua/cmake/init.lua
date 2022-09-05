@@ -1,4 +1,3 @@
-local dap = require('dap')
 local utils = require('cmake.utils')
 local config = require('cmake.config')
 local scandir = require('plenary.scandir')
@@ -85,7 +84,7 @@ function cmake.debug(...)
     cwd = target_dir.filename,
   }
 
-  dap.run(vim.tbl_extend('force', base_dap_config, dap_config))
+  require('dap').run(vim.tbl_extend('force', base_dap_config, dap_config))
   vim.api.nvim_command('cclose')
   if config.dap_open_command then
     config.dap_open_command()

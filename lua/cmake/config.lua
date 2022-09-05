@@ -24,7 +24,7 @@ local config = {
       cppdbg_vscode = { type = 'cppdbg', request = 'launch' },
     },
     dap_configuration = 'lldb_vscode',
-    dap_open_command = require('dap').repl.open,
+    dap_open_command = function(...) return require('dap').repl.open(...) end,
   },
 }
 
