@@ -1,5 +1,7 @@
 # Neovim CMake
 
+**This plugin has been deprecated in favor of [neovim-tasks](https://github.com/Shatur/neovim-tasks)**. I realized that having separate plugins for each build system is inconvenient, so I decided to write a general purpose plugin that could support support any build system. If you don't like this idea don't worry, there is a maintained hard fork called [cmake-tools.nvim](https://github.com/Civitasv/cmake-tools.nvim) with some additional features.
+
 A Neovim 0.7+ plugin that uses [cmake-file-api](https://cmake.org/cmake/help/latest/manual/cmake-file-api.7.html#codemodel-version-2) to provide integration with building, running and debugging projects with output to quickfix.
 
 ## Dependencies
